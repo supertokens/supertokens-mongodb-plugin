@@ -1,6 +1,6 @@
 mongodb_config_version: 0
 
-# (COMPULSORY) string value. This is the connection uri to connect to a mongodb instance of cluster as per https://docs.mongodb.com/manual/reference/connection-string/
+# (COMPULSORY) string value. This is the connection uri to connect to a mongodb instance or cluster as per https://docs.mongodb.com/manual/reference/connection-string/
 # mongodb_connection_uri:
 
 
