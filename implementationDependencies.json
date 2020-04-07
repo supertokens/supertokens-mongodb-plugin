@@ -1,0 +1,20 @@
+{
+  "_comment": "Contains list of implementation dependencies URL for this project",
+  "list": [
+    {
+      "jar": "https://repo1.maven.org/maven2/org/mongodb/bson/4.0.0/bson-4.0.0.jar",
+      "name": "MongoDB Driver 4.0.0",
+      "src": "https://repo1.maven.org/maven2/org/mongodb/bson/4.0.0/bson-4.0.0-sources.jar"
+    },
+    {
+      "jar": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.0.0/mongodb-driver-sync-4.0.0.jar",
+      "name": "MongoDB Driver 4.0.0",
+      "src": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.0.0/mongodb-driver-sync-4.0.0-sources.jar"
+    },
+    {
+      "jar": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/4.0.0/mongodb-driver-core-4.0.0.jar",
+      "name": "SLF4j API 1.7.25",
+      "src": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/4.0.0/mongodb-driver-core-4.0.0-sources.jar"
+    }
+  ]
+}

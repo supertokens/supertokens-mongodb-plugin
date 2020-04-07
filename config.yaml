@@ -1,0 +1,23 @@
+mongodb_config_version: 0
+
+# (COMPULSORY) string value. This is the connection uri to connect to a mongodb instance of cluster as per https://docs.mongodb.com/manual/reference/connection-string/
+# mongodb_connection_uri:
+
+
+# (OPTIONAL | Default: "auth_session") string value. The database name to store SuperTokens related data.
+# mongodb_database_name:
+
+
+# (OPTIONAL | Default: "key_value") string value. Specify the name of the collection that will store secret keys
+# and app info necessary for the functioning sessions.
+# mongodb_key_value_collection_name:
+
+
+# (OPTIONAL | Default: "session_info") string value. Specify the name of the collection that will store the
+# session info for users.
+# mongodb_session_info_collection_name:
+
+
+# (OPTIONAL | Default: "past_tokens") string name. Specify the name of the collection that will store old tokens.
+# This collection will only be used if your licenseKey has expired.
+# mongodb_past_tokens_collection_name:

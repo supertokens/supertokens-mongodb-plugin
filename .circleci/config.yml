@@ -1,0 +1,28 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: rishabhpoddar/supertokens_plugin_test
+      - image: mongo
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: root
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "a5:81:68:e0:75:b4:9f:ff:b2:9b:56:65:0f:03:cd:98"
+      - checkout
+      - run:
+          name: running tests
+          command: (cd .circleci/ && ./doTests.sh)
+
+workflows:
+  version: 2
+  tagged-build:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /dev-v[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
