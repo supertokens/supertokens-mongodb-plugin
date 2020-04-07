@@ -204,13 +204,6 @@ public class Queries {
                 .append("last_updated_sign", Utils.getUUID()));
     }
 
-    static boolean isSessionBlacklisted(Start start, String sessionHandle) {
-        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
-        MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
-
-        return collection.find(Filters.eq("_id", sessionHandle)).first() == null;
-    }
-
     static SessionInfoWithLastUpdated getSessionInfo_Transaction(Start start, String sessionHandle) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());

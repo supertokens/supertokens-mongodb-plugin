@@ -52,7 +52,7 @@ class TestingProcessManager {
         }
     }
 
-    public static TestingProcess start(String[] args, boolean startProcess, boolean stopLicenseKeyFromUpdating)
+    public static TestingProcess start(String[] args, boolean startProcess)
             throws InterruptedException {
         final Object waitForInit = new Object();
         synchronized (alive) {
@@ -63,9 +63,6 @@ class TestingProcessManager {
                     try {
 
                         this.main = new Main();
-                        if (stopLicenseKeyFromUpdating) {
-                            Utils.stopLicenseKeyFromUpdatingToLatest(this);
-                        }
                         synchronized (waitForInit) {
                             waitForInit.notifyAll();
                         }
@@ -92,10 +89,6 @@ class TestingProcessManager {
             alive.add(mainProcess);
             return mainProcess;
         }
-    }
-
-    public static TestingProcess start(String[] args, boolean startProcess) throws InterruptedException {
-        return start(args, startProcess, true);
     }
 
     public static TestingProcess start(String[] args) throws InterruptedException {

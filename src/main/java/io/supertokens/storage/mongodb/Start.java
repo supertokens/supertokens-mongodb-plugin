@@ -153,15 +153,6 @@ public class Start extends NoSQLStorage_1 {
     }
 
     @Override
-    public boolean isSessionBlacklisted(String sessionHandle) throws StorageQueryException {
-        try {
-            return Queries.isSessionBlacklisted(this, sessionHandle);
-        } catch (MongoException e) {
-            throw new StorageQueryException(e);
-        }
-    }
-
-    @Override
     public void createNewSession(String sessionHandle, String userId, String refreshTokenHash2,
                                  JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT,
                                  long createdAtTime)
