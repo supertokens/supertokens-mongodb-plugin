@@ -25,6 +25,7 @@ import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
 import io.supertokens.pluginInterface.STORAGE_TYPE;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
 import io.supertokens.pluginInterface.noSqlStorage.NoSQLStorage_1;
+import io.supertokens.pluginInterface.sqlStorage.SQLStorage;
 import io.supertokens.pluginInterface.tokenInfo.PastTokenInfo;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.output.Logging;
@@ -75,27 +76,28 @@ public class Start extends NoSQLStorage_1 {
     }
 
     @Override
+    public SQLStorage.SessionInfo getSession(String sessionHandle) throws StorageQueryException {
+        try {
+            return Queries.getSession(this, sessionHandle);
+        } catch (MongoException e) {
+            throw new StorageQueryException(e);
+        }
+    }
+
+    @Override
+    public int updateSession(String sessionHandle, JsonObject sessionData, JsonObject jwtPayload)
+            throws StorageQueryException {
+        try {
+            return Queries.updateSession(this, sessionHandle, sessionData, jwtPayload);
+        } catch (MongoException e) {
+            throw new StorageQueryException(e);
+        }
+    }
+
+    @Override
     public void deleteAllExpiredSessions() throws StorageQueryException {
         try {
             Queries.deleteAllExpiredSessions(this);
-        } catch (MongoException e) {
-            throw new StorageQueryException(e);
-        }
-    }
-
-    @Override
-    public JsonObject getSessionData(String sessionHandle) throws StorageQueryException {
-        try {
-            return Queries.getSessionData(this, sessionHandle);
-        } catch (MongoException e) {
-            throw new StorageQueryException(e);
-        }
-    }
-
-    @Override
-    public int updateSessionData(String sessionHandle, JsonObject updatedData) throws StorageQueryException {
-        try {
-            return Queries.updateSessionData(this, sessionHandle, updatedData);
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }

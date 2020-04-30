@@ -18,6 +18,7 @@
 package io.supertokens.storage.mongodb.test;
 
 import io.supertokens.Main;
+import io.supertokens.pluginInterface.PluginInterfaceTesting;
 import io.supertokens.storage.mongodb.Start;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.rules.TestRule;
@@ -68,6 +69,7 @@ abstract class Utils extends Mockito {
 
     static void reset() {
         Main.isTesting = true;
+        PluginInterfaceTesting.isTesting = true;
         Start.isTesting = true;
         Main.makeConsolePrintSilent = true;
         String installDir = "../";

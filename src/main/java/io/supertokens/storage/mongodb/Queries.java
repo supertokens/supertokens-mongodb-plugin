@@ -32,12 +32,14 @@ import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
 import io.supertokens.pluginInterface.noSqlStorage.NoSQLStorage_1.SessionInfoWithLastUpdated;
+import io.supertokens.pluginInterface.sqlStorage.SQLStorage;
 import io.supertokens.pluginInterface.tokenInfo.PastTokenInfo;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.utils.Utils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -288,40 +290,56 @@ public class Queries {
         return finalResult;
     }
 
-    static JsonObject getSessionData(Start start, String sessionHandle) {
-        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
-        MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
-
-        Document result = (Document) collection.find(Filters.eq("_id", sessionHandle)).first();
-
-        if (result == null) {
-            return null;
-        }
-
-        return new JsonParser().parse(result.getString("session_data")).getAsJsonObject();
-
-    }
-
-    static int updateSessionData(Start start, String sessionHandle, JsonObject updatedData) {
-        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
-        MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
-
-        UpdateResult result = collection.updateOne(
-                Filters.eq("_id", sessionHandle),
-                new Document("$set", new Document("session_data", updatedData.toString())
-                        .append("last_updated_sign", Utils.getUUID())),
-                new UpdateOptions().upsert(false)
-        );
-        // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
-
-        return result.getModifiedCount() == 1 ? 1 : 0;
-    }
-
     static void deleteAllExpiredSessions(Start start) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
         collection.deleteMany(Filters.lte("expires_at", System.currentTimeMillis()));
+    }
+
+    static SQLStorage.SessionInfo getSession(Start start, String sessionHandle) {
+        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
+        MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
+
+        Document result = (Document) collection.find(Filters.eq("_id", sessionHandle)).first();
+        if (result == null) {
+            return null;
+        }
+
+        return new SQLStorage.SessionInfo(sessionHandle, result.getString("user_id"),
+                result.getString("refresh_token_hash_2"),
+                new JsonParser().parse(result.getString("session_data")).getAsJsonObject(),
+                result.getLong("expires_at"),
+                new JsonParser().parse(result.getString("jwt_user_payload")).getAsJsonObject(),
+                result.getLong("created_at_time"));
+    }
+
+    static int updateSession(Start start, String sessionHandle, @Nullable JsonObject sessionData,
+                             @Nullable JsonObject jwtData) throws StorageQueryException {
+
+        if (sessionData == null && jwtData == null) {
+            throw new StorageQueryException(new Exception("sessionData and jwtData are null"));
+        }
+
+        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
+        MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
+
+        Document updated = new Document("last_updated_sign", Utils.getUUID());
+        if (sessionData != null) {
+            updated.append("session_data", sessionData.toString());
+        }
+        if (jwtData != null) {
+            updated.append("jwt_user_payload", jwtData.toString());
+        }
+
+        UpdateResult result = collection.updateOne(
+                Filters.eq("_id", sessionHandle),
+                new Document("$set", updated),
+                new UpdateOptions().upsert(false)
+        );
+        // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
+
+        return result.getModifiedCount() == 1 ? 1 : 0;
     }
 
     static void deletePastOrphanedTokens(Start start, long createdBefore) {
