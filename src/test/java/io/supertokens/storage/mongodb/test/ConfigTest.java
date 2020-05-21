@@ -84,7 +84,7 @@ public class ConfigTest {
 
     @Test
     public void testThatInvalidConfigThrowsRightError() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../", "PRODUCTION"};
 
         //'mongodb_connection_uri is not set properly in the config file
 

@@ -371,4 +371,9 @@ public class Start extends NoSQLStorage_1 {
         Runtime.getRuntime().addShutdownHook(shutdownHook);
     }
 
+    @Override
+    public boolean canBeUsed(String configFilePath) {
+        return Config.canBeUsed(this, configFilePath);
+    }
+
 }
