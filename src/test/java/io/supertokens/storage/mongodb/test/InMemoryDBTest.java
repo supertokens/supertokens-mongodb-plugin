@@ -200,4 +200,22 @@ public class InMemoryDBTest {
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
+    @Test
+    public void ifForceNoInMemoryThenDevShouldThrowError() throws IOException, InterruptedException {
+        String[] args = {"../", "DEV", "forceNoInMemDB=true"};
+
+        Utils.commentConfigValue("mongodb_connection_uri");
+
+        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+
+        ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
+        assertNotNull(e);
+        TestCase.assertEquals(e.exception.getMessage(),
+                "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart " +
+                        "SuperTokens");
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+    }
+
 }
