@@ -39,7 +39,6 @@ public class Start extends NoSQLStorage_1 {
     private String processId;
     private MongoDBLoggingAppender appender = new MongoDBLoggingAppender(this);
     private static final String APP_ID_KEY_NAME = "app_id";
-    private static final String USER_DEV_PRODUCTION_MODE_NAME = "user_dev_production_mode";
     private static final String ACCESS_TOKEN_SIGNING_KEY_NAME = "access_token_signing_key";
     private static final String REFRESH_TOKEN_KEY_NAME = "refresh_token_key";
     public static boolean isTesting = false;
@@ -286,21 +285,6 @@ public class Start extends NoSQLStorage_1 {
     }
 
     @Override
-    public String getUserDevProductionMode() throws StorageQueryException {
-        KeyValueInfo result = getKeyValue(USER_DEV_PRODUCTION_MODE_NAME);
-        if (result != null) {
-            return result.value;
-        }
-        return null;
-    }
-
-    @Override
-    public void setUserDevProductionMode(String mode) throws StorageQueryException {
-        KeyValueInfo keyInfo = new KeyValueInfo(mode, System.currentTimeMillis());
-        setKeyValue(USER_DEV_PRODUCTION_MODE_NAME, keyInfo);
-    }
-
-    @Override
     public void initStorage() {
         ConnectionPool.initPool(this);
     }
@@ -373,7 +357,7 @@ public class Start extends NoSQLStorage_1 {
 
     @Override
     public boolean canBeUsed(String configFilePath) {
-        return Config.canBeUsed(this, configFilePath);
+        return Config.canBeUsed(configFilePath);
     }
 
 }

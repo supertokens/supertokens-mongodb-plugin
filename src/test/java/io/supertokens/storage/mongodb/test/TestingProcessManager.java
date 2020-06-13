@@ -32,7 +32,7 @@ class TestingProcessManager {
 
     static void deleteAllInformation() throws Exception {
         System.out.println("----------DELETE ALL INFORMATION----------");
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
         TestingProcess process = TestingProcessManager.start(args);
         process.checkOrWaitForEvent(PROCESS_STATE.STARTED);
         process.main.deleteAllInformationForTesting();
@@ -161,8 +161,8 @@ class TestingProcessManager {
             Start start = (Start) StorageLayer.getStorageLayer(main);
             io.supertokens.storage.mongodb.ProcessState.EventAndException e =
                     io.supertokens.storage.mongodb.ProcessState
-                    .getInstance(start)
-                    .getLastEventByName(state);
+                            .getInstance(start)
+                            .getLastEventByName(state);
             if (e == null) {
                 // we shall now wait until some time as passed.
                 final long startTime = System.currentTimeMillis();

@@ -68,7 +68,7 @@ public class InMemoryDBTest {
         {
             Utils.commentConfigValue("mongodb_connection_uri");
 
-            String[] args = {"../", "DEV"};
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -91,7 +91,7 @@ public class InMemoryDBTest {
         }
 
         {
-            String[] args = {"../", "DEV"};
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -109,7 +109,7 @@ public class InMemoryDBTest {
             UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
             StorageTransactionLogicException {
         {
-            String[] args = {"../", "DEV"};
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -131,7 +131,7 @@ public class InMemoryDBTest {
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
         }
         {
-            String[] args = {"../", "DEV"};
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -149,7 +149,7 @@ public class InMemoryDBTest {
             UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
             StorageTransactionLogicException {
         {
-            String[] args = {"../", "PRODUCTION"};
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -171,7 +171,7 @@ public class InMemoryDBTest {
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
         }
         {
-            String[] args = {"../", "DEV"};
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -183,26 +183,8 @@ public class InMemoryDBTest {
     }
 
     @Test
-    public void checkThatErrorIsThrownIfIncorrectConfigInProduction() throws IOException, InterruptedException {
-        String[] args = {"../", "PRODUCTION"};
-
-        Utils.commentConfigValue("mongodb_connection_uri");
-
-        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
-
-        ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
-        assertNotNull(e);
-        TestCase.assertEquals(e.exception.getMessage(),
-                "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart " +
-                        "SuperTokens");
-
-        process.kill();
-        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
-    }
-
-    @Test
     public void ifForceNoInMemoryThenDevShouldThrowError() throws IOException, InterruptedException {
-        String[] args = {"../", "DEV", "forceNoInMemDB=true"};
+        String[] args = {"../", "forceNoInMemDB=true"};
 
         Utils.commentConfigValue("mongodb_connection_uri");
 

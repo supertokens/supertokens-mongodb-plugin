@@ -52,7 +52,7 @@ public class ConfigTest {
 
     @Test
     public void testThatDefaultConfigLoadsCorrectly() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -68,7 +68,7 @@ public class ConfigTest {
 
     @Test
     public void testThatCustomConfigLoadsCorrectly() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
 
         Utils.setValueInConfig("mongodb_past_tokens_collection_name", "\"temp_name\"");
 
@@ -82,36 +82,10 @@ public class ConfigTest {
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
-    @Test
-    public void testThatInvalidConfigThrowsRightError() throws Exception {
-        String[] args = {"../", "PRODUCTION"};
-
-        //'mongodb_connection_uri is not set properly in the config file
-
-        Utils.commentConfigValue("mongodb_connection_uri");
-
-        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
-
-        ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
-        assertNotNull(e);
-        TestCase.assertEquals(e.exception.getMessage(),
-                "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart " +
-                        "SuperTokens");
-
-        process.kill();
-        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
-
-        Utils.reset();
-
-        process.kill();
-        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
-
-
-    }
 
     @Test
     public void testThatMissingConfigFileThrowsError() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
 
         ProcessBuilder pb = new ProcessBuilder("rm", "-r", "config.yaml");
         pb.directory(new File(args[0]));
@@ -133,7 +107,7 @@ public class ConfigTest {
 
     @Test
     public void testCustomLocationForConfigLoadsCorrectly() throws Exception {
-        String[] args = {"../", "DEV", "configFile=../temp/config.yaml"};
+        String[] args = {"../", "configFile=../temp/config.yaml"};
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
@@ -145,7 +119,7 @@ public class ConfigTest {
 
         //absolute path
         File f = new File("../temp/config.yaml");
-        args = new String[]{"../", "DEV", "configFile=" + f.getAbsolutePath()};
+        args = new String[]{"../", "configFile=" + f.getAbsolutePath()};
 
         process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -159,7 +133,7 @@ public class ConfigTest {
 
     @Test
     public void testBadPortInput() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
 
         Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost:27018");
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args, false);
@@ -185,7 +159,7 @@ public class ConfigTest {
 
     @Test
     public void storageDisabledAndThenEnabled() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args, false);
         process.getProcess().waitToInitStorageModule();
@@ -210,7 +184,7 @@ public class ConfigTest {
 
     @Test
     public void testBadHostInput() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
 
         Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@random:27017");
 
@@ -231,7 +205,7 @@ public class ConfigTest {
 
     @Test
     public void testThatChangeInCollectionNameIsCorrect() throws Exception {
-        String[] args = {"../", "DEV"};
+        String[] args = {"../"};
 
         Utils.setValueInConfig("mongodb_key_value_collection_name", "key_value_collection");
         Utils.setValueInConfig("mongodb_session_info_collection_name", "session_info_collection");
