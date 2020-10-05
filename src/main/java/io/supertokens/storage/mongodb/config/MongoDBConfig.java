@@ -39,9 +39,6 @@ public class MongoDBConfig {
     @JsonProperty
     private String mongodb_session_info_collection_name = "session_info";
 
-    @JsonProperty
-    private String mongodb_past_tokens_collection_name = "past_tokens";
-
     public String getConnectionURI() {
         return mongodb_connection_uri;
     }
@@ -56,10 +53,6 @@ public class MongoDBConfig {
 
     public String getSessionInfoCollection() {
         return mongodb_session_info_collection_name;
-    }
-
-    public String getPastTokensCollection() {
-        return mongodb_past_tokens_collection_name;
     }
 
     void validateAndInitialise() {

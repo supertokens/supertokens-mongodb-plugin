@@ -70,13 +70,13 @@ public class ConfigTest {
     public void testThatCustomConfigLoadsCorrectly() throws Exception {
         String[] args = {"../"};
 
-        Utils.setValueInConfig("mongodb_past_tokens_collection_name", "\"temp_name\"");
+        Utils.setValueInConfig("mongodb_key_value_collection_name", "\"temp_name\"");
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
         MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorageLayer(process.getProcess()));
-        assertEquals(config.getPastTokensCollection(), "temp_name");
+        assertEquals(config.getKeyValueCollection(), "temp_name");
 
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -209,14 +209,11 @@ public class ConfigTest {
 
         Utils.setValueInConfig("mongodb_key_value_collection_name", "key_value_collection");
         Utils.setValueInConfig("mongodb_session_info_collection_name", "session_info_collection");
-        Utils.setValueInConfig("mongodb_past_tokens_collection_name", "past_tokens_collection");
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
         MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorageLayer(process.getProcess()));
 
-        assertEquals("change in PastTokensCollection name not reflected", config.getPastTokensCollection(),
-                "past_tokens_collection");
         assertEquals("change in KeyValueCollection name not reflected", config.getKeyValueCollection(),
                 "key_value_collection");
         assertEquals("change in SessionInfoCollection name not reflected", config.getSessionInfoCollection(),
@@ -232,8 +229,6 @@ public class ConfigTest {
                 "mongodb://root:root@localhost:27017");
         assertEquals("Config databaseName does not match default", config.getDatabaseName(), "auth_session");
         assertEquals("Config keyValue collection does not match default", config.getKeyValueCollection(), "key_value");
-        assertEquals("Config pastTokensCollection does not match default", config.getPastTokensCollection(),
-                "past_tokens");
         assertEquals("Config sessionInfoCollection does not match default", config.getSessionInfoCollection(),
                 "session_info");
     }

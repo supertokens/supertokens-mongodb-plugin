@@ -26,7 +26,6 @@ import io.supertokens.pluginInterface.STORAGE_TYPE;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
 import io.supertokens.pluginInterface.noSqlStorage.NoSQLStorage_1;
 import io.supertokens.pluginInterface.sqlStorage.SQLStorage;
-import io.supertokens.pluginInterface.tokenInfo.PastTokenInfo;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.output.Logging;
 import org.slf4j.LoggerFactory;
@@ -58,15 +57,6 @@ public class Start extends NoSQLStorage_1 {
     @Override
     public void close() {
         ConnectionPool.close(this);
-    }
-
-    @Override
-    public void deletePastOrphanedTokens(long createdBefore) throws StorageQueryException {
-        try {
-            Queries.deletePastOrphanedTokens(this, createdBefore);
-        } catch (MongoException e) {
-            throw new StorageQueryException(e);
-        }
     }
 
     @Override
@@ -161,33 +151,6 @@ public class Start extends NoSQLStorage_1 {
         try {
             Queries.createNewSession(this, sessionHandle, userId, refreshTokenHash2, userDataInDatabase, expiry,
                     userDataInJWT, createdAtTime);
-        } catch (MongoException e) {
-            throw new StorageQueryException(e);
-        }
-    }
-
-    @Override
-    public int getNumberOfPastTokens() throws StorageQueryException {
-        try {
-            return Queries.getNumberOfPastTokens(this);
-        } catch (MongoException e) {
-            throw new StorageQueryException(e);
-        }
-    }
-
-    @Override
-    public void insertPastToken(PastTokenInfo info) throws StorageQueryException {
-        try {
-            Queries.insertPastTokenInfo(this, info);
-        } catch (MongoException e) {
-            throw new StorageQueryException(e);
-        }
-    }
-
-    @Override
-    public PastTokenInfo getPastTokenInfo(String refreshTokenHash2) throws StorageQueryException {
-        try {
-            return Queries.getPastTokenInfo(this, refreshTokenHash2);
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }

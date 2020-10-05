@@ -33,7 +33,6 @@ import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
 import io.supertokens.pluginInterface.noSqlStorage.NoSQLStorage_1.SessionInfoWithLastUpdated;
 import io.supertokens.pluginInterface.sqlStorage.SQLStorage;
-import io.supertokens.pluginInterface.tokenInfo.PastTokenInfo;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.utils.Utils;
 import org.bson.Document;
@@ -56,11 +55,6 @@ public class Queries {
             MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
             collection.deleteMany(new Document());
         }
-        {
-            MongoCollection collection = client.getCollection(Config.getConfig(start).getPastTokensCollection());
-            collection.deleteMany(new Document());
-        }
-
     }
 
     private static boolean isDuplicateKeyException(Exception e) {
@@ -155,38 +149,6 @@ public class Queries {
         }
         return new KeyValueInfoWithLastUpdated(result.getString("value"), result.getLong("created_at_time"),
                 result.getString("last_updated_sign"));
-    }
-
-    static PastTokenInfo getPastTokenInfo(Start start, String refreshTokenHash2) {
-        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
-        MongoCollection collection = client.getCollection(Config.getConfig(start).getPastTokensCollection());
-        Document result = (Document) collection.find(Filters.eq("_id", refreshTokenHash2)).first();
-        if (result == null) {
-            return null;
-        }
-        return new PastTokenInfo(refreshTokenHash2, result.getString("session_handle"),
-                result.getString("parent_refresh_token_hash_2"), result.getLong("created_at_time"));
-    }
-
-    @SuppressWarnings("unchecked")
-    static void insertPastTokenInfo(Start start, PastTokenInfo info) {
-        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
-        MongoCollection collection = client.getCollection(Config.getConfig(start).getPastTokensCollection());
-
-        collection.insertOne(
-                new Document("_id", info.refreshTokenHash2)
-                        .append("parent_refresh_token_hash_2", info.parentRefreshTokenHash2)
-                        .append("session_handle", info.sessionHandle)
-                        .append("created_at_time", info.createdTime)
-        );
-    }
-
-    static int getNumberOfPastTokens(Start start) {
-        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
-        MongoCollection collection = client.getCollection(Config.getConfig(start).getPastTokensCollection());
-
-        return Math.toIntExact(collection.countDocuments());    // this is only used in testing, so this is OK.
-
     }
 
     @SuppressWarnings("unchecked")
@@ -342,34 +304,4 @@ public class Queries {
         return result.getModifiedCount() == 1 ? 1 : 0;
     }
 
-    static void deletePastOrphanedTokens(Start start, long createdBefore) {
-        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
-        MongoCollection pastTokenCollection = client.getCollection(Config.getConfig(start).getPastTokensCollection());
-        MongoCollection sessionCollection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
-
-        List<Bson> toDelete = new ArrayList<>();
-
-        // get all tokens that have created_at_time < createBefore
-        try (MongoCursor cursor = pastTokenCollection.find(Filters.lt("created_at_time", createdBefore)).iterator()) {
-            while (cursor.hasNext()) {
-
-                // for each of them, we check if we need to delete them.
-
-                Document currDoc = (Document) cursor.next();
-                String refreshTokenHash2 = currDoc.getString("_id");
-                String parentRefreshTokenHash2 = currDoc.getString("parent_refresh_token_hash_2");
-                if (sessionCollection.find(Filters.eq("refresh_token_hash_2", refreshTokenHash2)).first() == null
-                        &&
-                        sessionCollection.find(Filters.eq("refresh_token_hash_2", parentRefreshTokenHash2)).first() ==
-                                null) {
-                    toDelete.add(Filters.eq("_id", refreshTokenHash2));
-                }
-            }
-        }
-
-        // we delete the necessary documents
-        if (toDelete.size() > 0) {
-            pastTokenCollection.deleteMany(Filters.or(toDelete));
-        }
-    }
 }
