@@ -4,7 +4,7 @@ mongodb_config_version: 0
 # mongodb_connection_uri:
 
 
-# (OPTIONAL | Default: "auth_session") string value. The database name to store SuperTokens related data.
+# (OPTIONAL | Default: "supertokens") string value. The database name to store SuperTokens related data.
 # mongodb_database_name:
 
 

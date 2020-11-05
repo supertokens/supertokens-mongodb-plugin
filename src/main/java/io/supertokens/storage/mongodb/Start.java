@@ -24,13 +24,14 @@ import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
 import io.supertokens.pluginInterface.STORAGE_TYPE;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
-import io.supertokens.pluginInterface.noSqlStorage.NoSQLStorage_1;
-import io.supertokens.pluginInterface.sqlStorage.SQLStorage;
+import io.supertokens.pluginInterface.session.SessionInfo;
+import io.supertokens.pluginInterface.session.noSqlStorage.SessionInfoWithLastUpdated;
+import io.supertokens.pluginInterface.session.noSqlStorage.SessionNoSQLStorage_1;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.output.Logging;
 import org.slf4j.LoggerFactory;
 
-public class Start extends NoSQLStorage_1 {
+public class Start implements SessionNoSQLStorage_1 {
 
     private static final Object appenderLock = new Object();
     public static boolean silent = false;
@@ -65,7 +66,7 @@ public class Start extends NoSQLStorage_1 {
     }
 
     @Override
-    public SQLStorage.SessionInfo getSession(String sessionHandle) throws StorageQueryException {
+    public SessionInfo getSession(String sessionHandle) throws StorageQueryException {
         try {
             return Queries.getSession(this, sessionHandle);
         } catch (MongoException e) {
@@ -242,23 +243,8 @@ public class Start extends NoSQLStorage_1 {
     }
 
     @Override
-    public void setAppId(String appId) throws StorageQueryException {
-        KeyValueInfo keyInfo = new KeyValueInfo(appId, System.currentTimeMillis());
-        setKeyValue(APP_ID_KEY_NAME, keyInfo);
-    }
-
-    @Override
     public void initStorage() {
         ConnectionPool.initPool(this);
-    }
-
-    @Override
-    public String getAppId() throws StorageQueryException {
-        KeyValueInfo result = getKeyValue(APP_ID_KEY_NAME);
-        if (result != null) {
-            return result.value;
-        }
-        return null;
     }
 
     @Override

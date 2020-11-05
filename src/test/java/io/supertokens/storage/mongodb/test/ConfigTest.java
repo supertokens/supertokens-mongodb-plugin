@@ -227,7 +227,7 @@ public class ConfigTest {
 
         assertEquals("Config connectionPoolSize did not match default", config.getConnectionURI(),
                 "mongodb://root:root@localhost:27017");
-        assertEquals("Config databaseName does not match default", config.getDatabaseName(), "auth_session");
+        assertEquals("Config databaseName does not match default", config.getDatabaseName(), "supertokens");
         assertEquals("Config keyValue collection does not match default", config.getKeyValueCollection(), "key_value");
         assertEquals("Config sessionInfoCollection does not match default", config.getSessionInfoCollection(),
                 "session_info");

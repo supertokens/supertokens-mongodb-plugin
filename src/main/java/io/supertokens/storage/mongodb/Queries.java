@@ -31,8 +31,8 @@ import com.mongodb.client.result.UpdateResult;
 import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
-import io.supertokens.pluginInterface.noSqlStorage.NoSQLStorage_1.SessionInfoWithLastUpdated;
-import io.supertokens.pluginInterface.sqlStorage.SQLStorage;
+import io.supertokens.pluginInterface.session.SessionInfo;
+import io.supertokens.pluginInterface.session.noSqlStorage.SessionInfoWithLastUpdated;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.utils.Utils;
 import org.bson.Document;
@@ -259,7 +259,7 @@ public class Queries {
         collection.deleteMany(Filters.lte("expires_at", System.currentTimeMillis()));
     }
 
-    static SQLStorage.SessionInfo getSession(Start start, String sessionHandle) {
+    static SessionInfo getSession(Start start, String sessionHandle) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
@@ -268,7 +268,7 @@ public class Queries {
             return null;
         }
 
-        return new SQLStorage.SessionInfo(sessionHandle, result.getString("user_id"),
+        return new SessionInfo(sessionHandle, result.getString("user_id"),
                 result.getString("refresh_token_hash_2"),
                 new JsonParser().parse(result.getString("session_data")).getAsJsonObject(),
                 result.getLong("expires_at"),

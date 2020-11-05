@@ -31,7 +31,7 @@ public class MongoDBConfig {
     private String mongodb_connection_uri = null;
 
     @JsonProperty
-    private String mongodb_database_name = "auth_session";
+    private String mongodb_database_name = "supertokens";
 
     @JsonProperty
     private String mongodb_key_value_collection_name = "key_value";
