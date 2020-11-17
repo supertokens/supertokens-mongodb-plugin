@@ -84,7 +84,7 @@ public class InMemoryDBTest {
             assert sessionInfo.accessToken != null;
             assert sessionInfo.refreshToken != null;
 
-            assertEquals(StorageLayer.getSessionStorageLayer(process.getProcess()).getNumberOfSessions(), 1);
+            assertEquals(StorageLayer.getSessionStorage(process.getProcess()).getNumberOfSessions(), 1);
 
             process.kill();
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -95,7 +95,7 @@ public class InMemoryDBTest {
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-            assertEquals(StorageLayer.getSessionStorageLayer(process.getProcess()).getNumberOfSessions(), 0);
+            assertEquals(StorageLayer.getSessionStorage(process.getProcess()).getNumberOfSessions(), 0);
 
             process.kill();
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -125,7 +125,7 @@ public class InMemoryDBTest {
             assert sessionInfo.accessToken != null;
             assert sessionInfo.refreshToken != null;
 
-            assertEquals(StorageLayer.getSessionStorageLayer(process.getProcess()).getNumberOfSessions(), 1);
+            assertEquals(StorageLayer.getSessionStorage(process.getProcess()).getNumberOfSessions(), 1);
 
             process.kill();
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -135,7 +135,7 @@ public class InMemoryDBTest {
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-            assertEquals(StorageLayer.getSessionStorageLayer(process.getProcess()).getNumberOfSessions(), 1);
+            assertEquals(StorageLayer.getSessionStorage(process.getProcess()).getNumberOfSessions(), 1);
 
             process.kill();
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -165,7 +165,7 @@ public class InMemoryDBTest {
             assert sessionInfo.accessToken != null;
             assert sessionInfo.refreshToken != null;
 
-            assertEquals(StorageLayer.getSessionStorageLayer(process.getProcess()).getNumberOfSessions(), 1);
+            assertEquals(StorageLayer.getSessionStorage(process.getProcess()).getNumberOfSessions(), 1);
 
             process.kill();
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -175,7 +175,7 @@ public class InMemoryDBTest {
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-            assertEquals(StorageLayer.getSessionStorageLayer(process.getProcess()).getNumberOfSessions(), 1);
+            assertEquals(StorageLayer.getSessionStorage(process.getProcess()).getNumberOfSessions(), 1);
 
             process.kill();
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
