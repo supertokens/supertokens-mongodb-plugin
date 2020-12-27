@@ -30,6 +30,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
+import io.supertokens.pluginInterface.RowMapper;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
 import io.supertokens.pluginInterface.session.SessionInfo;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionInfoWithLastUpdated;
@@ -132,7 +133,7 @@ public class Queries {
         }
     }
 
-    static KeyValueInfo getKeyValue(Start start, String key) {
+    static KeyValueInfo getKeyValue(Start start, String key) throws StorageQueryException{
         KeyValueInfoWithLastUpdated result = getKeyValue_Transaction(start, key);
         if (result == null) {
             return null;
@@ -140,15 +141,14 @@ public class Queries {
         return new KeyValueInfo(result.value, result.createdAtTime);
     }
 
-    static KeyValueInfoWithLastUpdated getKeyValue_Transaction(Start start, String key) {
+    static KeyValueInfoWithLastUpdated getKeyValue_Transaction(Start start, String key) throws StorageQueryException{
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
         Document result = (Document) collection.find(Filters.eq("_id", key)).first();
         if (result == null) {
             return null;
         }
-        return new KeyValueInfoWithLastUpdated(result.getString("value"), result.getLong("created_at_time"),
-                result.getString("last_updated_sign"));
+        return KeyValueInfoLastUpdatedRowMapper.getInstance().mapOrThrow(result);
     }
 
     @SuppressWarnings("unchecked")
@@ -168,7 +168,7 @@ public class Queries {
                 .append("last_updated_sign", Utils.getUUID()));
     }
 
-    static SessionInfoWithLastUpdated getSessionInfo_Transaction(Start start, String sessionHandle) {
+    static SessionInfoWithLastUpdated getSessionInfo_Transaction(Start start, String sessionHandle) throws StorageQueryException{
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
@@ -177,13 +177,7 @@ public class Queries {
             return null;
         }
 
-        return new SessionInfoWithLastUpdated(sessionHandle, result.getString("user_id"),
-                result.getString("refresh_token_hash_2"),
-                new JsonParser().parse(result.getString("session_data")).getAsJsonObject(),
-                result.getLong("expires_at"),
-                new JsonParser().parse(result.getString("jwt_user_payload")).getAsJsonObject(),
-                result.getLong("created_at_time"),
-                result.getString("last_updated_sign"));
+        return SessionInfoLastUpdatedRowMapper.getInstance().mapOrThrow(result);
     }
 
     static boolean updateSessionInfo_Transaction(Start start, String sessionHandle,
@@ -259,7 +253,7 @@ public class Queries {
         collection.deleteMany(Filters.lte("expires_at", System.currentTimeMillis()));
     }
 
-    static SessionInfo getSession(Start start, String sessionHandle) {
+    static SessionInfo getSession(Start start, String sessionHandle) throws StorageQueryException {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
@@ -267,14 +261,9 @@ public class Queries {
         if (result == null) {
             return null;
         }
-
-        return new SessionInfo(sessionHandle, result.getString("user_id"),
-                result.getString("refresh_token_hash_2"),
-                new JsonParser().parse(result.getString("session_data")).getAsJsonObject(),
-                result.getLong("expires_at"),
-                new JsonParser().parse(result.getString("jwt_user_payload")).getAsJsonObject(),
-                result.getLong("created_at_time"));
-    }
+        SessionInfoLastUpdatedRowMapper.INSTANCE.mapOrThrow(null);
+        return SessionInfoRowMapper.getInstance().mapOrThrow(result);
+   }
 
     static int updateSession(Start start, String sessionHandle, @Nullable JsonObject sessionData,
                              @Nullable JsonObject jwtData) throws StorageQueryException {
@@ -304,4 +293,64 @@ public class Queries {
         return result.getModifiedCount() == 1 ? 1 : 0;
     }
 
+    private static class SessionInfoRowMapper implements RowMapper<SessionInfo, Document> {
+        private static final SessionInfoRowMapper INSTANCE = new SessionInfoRowMapper();
+
+        private SessionInfoRowMapper() {}
+
+        private static SessionInfoRowMapper getInstance() {
+            return INSTANCE;
+        }
+
+        @Override
+        public SessionInfo map(Document result) throws Exception {
+            JsonParser jp = new JsonParser();
+            return new SessionInfo(result.getString("_id"), result.getString("user_id"),
+                result.getString("refresh_token_hash_2"),
+                jp.parse(result.getString("session_data")).getAsJsonObject(),
+                result.getLong("expires_at"),
+                jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
+                result.getLong("created_at_time"));
+        }
+    }
+
+    private static class KeyValueInfoLastUpdatedRowMapper implements RowMapper<KeyValueInfoWithLastUpdated, Document> {
+        private static final KeyValueInfoLastUpdatedRowMapper INSTANCE = new KeyValueInfoLastUpdatedRowMapper();
+
+        private KeyValueInfoLastUpdatedRowMapper(){
+        }
+
+        private static KeyValueInfoLastUpdatedRowMapper getInstance(){
+            return INSTANCE;
+        }
+
+        @Override
+        public KeyValueInfoWithLastUpdated map(Document result) throws Exception {
+            return new KeyValueInfoWithLastUpdated(result.getString("value"), result.getLong("created_at_time"),
+                result.getString("last_updated_sign"));
+        }
+    }
+
+    private static class SessionInfoLastUpdatedRowMapper implements RowMapper<SessionInfoWithLastUpdated, Document> {
+        private static final SessionInfoLastUpdatedRowMapper INSTANCE = new SessionInfoLastUpdatedRowMapper();
+
+        private SessionInfoLastUpdatedRowMapper(){
+        }
+
+        private static SessionInfoLastUpdatedRowMapper getInstance(){
+            return INSTANCE;
+        }
+
+        @Override
+        public SessionInfoWithLastUpdated map(Document result) throws Exception {
+            JsonParser jp = new JsonParser();
+            return new SessionInfoWithLastUpdated(result.getString("_id"), result.getString("user_id"),
+                result.getString("refresh_token_hash_2"),
+                jp.parse(result.getString("session_data")).getAsJsonObject(),
+                result.getLong("expires_at"),
+                jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
+                result.getLong("created_at_time"),
+                result.getString("last_updated_sign"));
+        }
+    }
 }
