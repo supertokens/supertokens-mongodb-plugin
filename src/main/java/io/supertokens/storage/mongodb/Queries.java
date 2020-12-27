@@ -261,7 +261,6 @@ public class Queries {
         if (result == null) {
             return null;
         }
-        SessionInfoLastUpdatedRowMapper.INSTANCE.mapOrThrow(null);
         return SessionInfoRowMapper.getInstance().mapOrThrow(result);
    }
 
