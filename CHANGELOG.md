@@ -6,9 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.4.1] - 2021-0114
+## [1.5.0] - 2021-0114
 ### Changed
 - Used rowmapper interface
+- Uses new plugin interface
 
 ## [1.4.0] - 2020-11-06
 ### Added
