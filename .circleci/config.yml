@@ -4,7 +4,7 @@ orbs:
 jobs:
   test:
     docker:
-      - image: rishabhpoddar/supertokens_plugin_test
+      - image: rishabhpoddar/supertokens_core_testing
       - image: mongo
         environment:
           MONGO_INITDB_ROOT_USERNAME: root
