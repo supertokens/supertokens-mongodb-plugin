@@ -34,10 +34,13 @@ public class MongoDBConfig {
     private String mongodb_database_name = "supertokens";
 
     @JsonProperty
-    private String mongodb_key_value_collection_name = "key_value";
+    private String mongodb_key_value_collection_name = null;
 
     @JsonProperty
-    private String mongodb_session_info_collection_name = "session_info";
+    private String mongodb_session_info_collection_name = null;
+
+    @JsonProperty
+    private String mongodb_collection_names_prefix = "";
 
     public String getConnectionURI() {
         return mongodb_connection_uri;
@@ -48,11 +51,26 @@ public class MongoDBConfig {
     }
 
     public String getKeyValueCollection() {
-        return mongodb_key_value_collection_name;
+        String tableName = "key_value";
+        if (mongodb_key_value_collection_name != null) {
+            return mongodb_key_value_collection_name;
+        }
+        return addPrefixToTableName(tableName);
     }
 
     public String getSessionInfoCollection() {
-        return mongodb_session_info_collection_name;
+        String tableName = "session_info";
+        if (mongodb_session_info_collection_name != null) {
+            return mongodb_session_info_collection_name;
+        }
+        return addPrefixToTableName(tableName);
+    }
+
+    private String addPrefixToTableName(String tableName) {
+        if (!mongodb_collection_names_prefix.trim().equals("")) {
+            return mongodb_collection_names_prefix.trim() + "_" + tableName;
+        }
+        return tableName;
     }
 
     void validateAndInitialise() {

@@ -255,6 +255,25 @@ public class ConfigTest {
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
+    @Test
+    public void testAddingTableNamePrefixWorks() throws Exception {
+        String[] args = {"../"};
+
+        Utils.setValueInConfig("mongodb_key_value_collection_name", "key_value_table");
+        Utils.setValueInConfig("mongodb_collection_names_prefix", "some_prefix");
+
+        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+        MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
+
+        assertEquals("change in KeyValueTable name not reflected", config.getKeyValueCollection(), "key_value_table");
+        assertEquals("change in SessionInfoTable name not reflected", config.getSessionInfoCollection(),
+                "some_prefix_session_info");
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+    }
+
     private static void checkConfig(MongoDBConfig config) {
 
         assertEquals("Config connectionPoolSize did not match default", config.getConnectionURI(),

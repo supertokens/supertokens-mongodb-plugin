@@ -8,6 +8,11 @@ mongodb_connection_uri: "mongodb://root:root@localhost:27017"
 # mongodb_database_name:
 
 
+# (OPTIONAL | Default: "") string value. A prefix to add to all collections names managed by SuperTokens. An "_" will be
+# added between this prefix and the actual collection name if the prefix is defined
+# mongodb_collection_names_prefix:
+
+
 # (OPTIONAL | Default: "key_value") string value. Specify the name of the collection that will store secret keys
 # and app info necessary for the functioning sessions.
 # mongodb_key_value_collection_name:
