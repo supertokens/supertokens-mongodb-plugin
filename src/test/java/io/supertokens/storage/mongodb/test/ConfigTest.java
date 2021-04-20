@@ -17,7 +17,10 @@
 
 package io.supertokens.storage.mongodb.test;
 
+import com.google.gson.JsonObject;
 import io.supertokens.ProcessState;
+import io.supertokens.session.Session;
+import io.supertokens.session.info.SessionInformationHolder;
 import io.supertokens.storage.mongodb.ConnectionPoolTestContent;
 import io.supertokens.storage.mongodb.Start;
 import io.supertokens.storage.mongodb.config.Config;
@@ -60,6 +63,35 @@ public class ConfigTest {
         MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
 
         checkConfig(config);
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+
+    }
+
+    @Test
+    public void testThatMongoSRVConnectionURIWorksCorrectly() throws Exception {
+        String[] args = {"../"};
+
+        Utils.setValueInConfig("mongodb_connection_uri",
+                "\"mongodb+srv://root:root@cluster0.4e3yc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority\"");
+
+        Utils.setValueInConfig("mongodb_database_name", "\"myFirstDatabase\"");
+
+        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+
+        String userId = "userId";
+        JsonObject userDataInJWT = new JsonObject();
+        userDataInJWT.addProperty("key", "value");
+        JsonObject userDataInDatabase = new JsonObject();
+        userDataInDatabase.addProperty("key", "value");
+
+        SessionInformationHolder sessionInfo = Session.createNewSession(process.getProcess(), userId, userDataInJWT,
+                userDataInDatabase);
+
+        assert sessionInfo.accessToken != null;
+        assert sessionInfo.refreshToken != null;
 
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
