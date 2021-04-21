@@ -35,8 +35,7 @@ import org.junit.rules.TestRule;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class ConfigTest {
 
@@ -274,10 +273,139 @@ public class ConfigTest {
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
+    @Test
+    public void testValidConnectionURI() throws Exception {
+        {
+            String[] args = {"../"};
+
+            Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost:27017/supertokens");
+            Utils.commentConfigValue("mongodb_database_name");
+
+            TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+            MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
+            checkConfig(config);
+
+            process.kill();
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+        }
+
+        {
+            Utils.reset();
+            String[] args = {"../"};
+
+            Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost/supertokens");
+            Utils.commentConfigValue("mongodb_database_name");
+
+            TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+            MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
+            assertEquals(config.getPort(), -1);
+
+            process.kill();
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+        }
+
+        {
+            Utils.reset();
+            String[] args = {"../"};
+
+            Utils.setValueInConfig("mongodb_connection_uri", "mongodb://localhost:27017/supertokens");
+            Utils.commentConfigValue("mongodb_database_name");
+
+            TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+            MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
+            assertNull(config.getUser());
+
+            process.kill();
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+        }
+
+        {
+            Utils.reset();
+            String[] args = {"../"};
+
+            Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost:27017");
+            Utils.commentConfigValue("mongodb_database_name");
+
+            TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+            MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
+            checkConfig(config);
+
+            process.kill();
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+        }
+    }
+
+    @Test
+    public void testInvalidConnectionURI() throws Exception {
+        {
+            String[] args = {"../"};
+
+            Utils.setValueInConfig("mongodb_connection_uri", ":/localhost:27017/supertokens");
+
+            TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+            ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
+            assertNotNull(e);
+            assertEquals(
+                    "The provided mongodb connection URI has an incorrect format. Please use a format like " +
+                            "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...",
+                    e.exception.getMessage());
+
+            process.kill();
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+        }
+
+    }
+
+    @Test
+    public void testValidConnectionURIAttributes() throws Exception {
+        {
+            String[] args = {"../"};
+
+            Utils.setValueInConfig("mongodb_connection_uri",
+                    "mongodb://root:root@localhost:27017/supertokens?key1=value1");
+
+            TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+            MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
+            assertEquals(config.getConnectionAttributes(), "key1=value1");
+
+            process.kill();
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+        }
+
+        {
+            Utils.reset();
+            String[] args = {"../"};
+
+            Utils.setValueInConfig("mongodb_connection_uri",
+                    "mongodb://root:root@localhost:27017/supertokens?key1=value1&key2" +
+                            "=value2");
+
+            TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+            MongoDBConfig config = Config.getConfig((Start) StorageLayer.getStorage(process.getProcess()));
+            assertEquals(config.getConnectionAttributes(), "key1=value1&key2=value2");
+
+            process.kill();
+            assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+        }
+    }
+
     private static void checkConfig(MongoDBConfig config) {
 
-        assertEquals("Config connectionPoolSize did not match default", config.getConnectionURI(),
-                "mongodb://root:root@localhost:27017");
+        assertEquals("Config getAttributes did not match default", config.getConnectionAttributes(),
+                "");
+        assertEquals("Config getSchema did not match default", config.getConnectionScheme(),
+                "mongodb");
+        assertEquals("Config databaseName does not match default", config.getDatabaseName(), "supertokens");
+        assertEquals("Config hostName does not match default ", config.getHostName(), "localhost");
+        assertEquals("Config port does not match default", config.getPort(), 27017);
+        assertEquals("Config user does not match default", config.getUser(), "root");
+        assertEquals("Config password does not match default", config.getPassword(), "root");
         assertEquals("Config databaseName does not match default", config.getDatabaseName(), "supertokens");
         assertEquals("Config keyValue collection does not match default", config.getKeyValueCollection(), "key_value");
         assertEquals("Config sessionInfoCollection does not match default", config.getSessionInfoCollection(),
