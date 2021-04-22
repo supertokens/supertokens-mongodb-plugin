@@ -44,39 +44,45 @@ class ConnectionPool extends ResourceDistributor.SingletonResource {
 
         MongoDBConfig userConfig = Config.getConfig(start);
 
-        String scheme = userConfig.getConnectionScheme();
-
-        String hostName = userConfig.getHostName();
-
-        String port = userConfig.getPort() + "";
-        if (!port.equals("-1")) {
-            port = ":" + port;
+        String connectionURI = "";
+        if (userConfig.useConnectionURIAsIs()) {
+            connectionURI = userConfig.getConnectionURI();
         } else {
-            port = "";
-        }
 
-        String attributes = userConfig.getConnectionAttributes();
-        if (!attributes.equals("")) {
-            attributes = "?" + attributes;
-        }
+            String scheme = userConfig.getConnectionScheme();
 
-        String user = userConfig.getUser();
-        String password = userConfig.getPassword();
-        String userInfo = "";
-        if (user != null) {
-            userInfo = user;
-        }
-        if (password != null) {
-            userInfo += ":" + password;
-        }
-        if (!userInfo.equals("")) {
-            userInfo += "@";
-        }
+            String hostName = userConfig.getHostName();
 
-        // We omit database on purpose since that causes auth issues. Database is selected when
-        // we fetch a connection.
-        String connectionURI = scheme + "://" + userInfo + hostName + port + "/" + attributes;
+            String port = userConfig.getPort() + "";
+            if (!port.equals("-1")) {
+                port = ":" + port;
+            } else {
+                port = "";
+            }
 
+            String attributes = userConfig.getConnectionAttributes();
+            if (!attributes.equals("")) {
+                attributes = "?" + attributes;
+            }
+
+            String user = userConfig.getUser();
+            String password = userConfig.getPassword();
+            String userInfo = "";
+            if (user != null) {
+                userInfo = user;
+            }
+            if (password != null) {
+                userInfo += ":" + password;
+            }
+            if (!userInfo.equals("")) {
+                userInfo += "@";
+            }
+
+            // We omit database on purpose since that causes auth issues. Database is selected when
+            // we fetch a connection.
+            connectionURI = scheme + "://" + userInfo + hostName + port + "/" + attributes;
+
+        }
 
         mongoClient = MongoClients.create(MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionURI))

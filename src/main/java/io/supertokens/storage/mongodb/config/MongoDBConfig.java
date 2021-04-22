@@ -44,6 +44,10 @@ public class MongoDBConfig {
     @JsonProperty
     private String mongodb_collection_names_prefix = "";
 
+    public boolean useConnectionURIAsIs() {
+        return mongodb_database_name == null && mongodb_connection_uri != null;
+    }
+
     public String getConnectionScheme() {
         URI uri = URI.create(mongodb_connection_uri);
 
