@@ -32,7 +32,7 @@ import java.text.NumberFormat;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-class ConnectionPool extends ResourceDistributor.SingletonResource {
+public class ConnectionPool extends ResourceDistributor.SingletonResource {
 
     private static final String RESOURCE_KEY = "io.supertokens.storage.mongodb.ConnectionPool";
     private final MongoClient mongoClient;
@@ -185,7 +185,7 @@ class ConnectionPool extends ResourceDistributor.SingletonResource {
         }
     }
 
-    static MongoDatabase getClientConnectedToDatabase(Start start) {
+    public static MongoDatabase getClientConnectedToDatabase(Start start) {
         if (getInstance(start) == null) {
             throw new QuitProgramFromPluginException("Please call initPool before getConnection");
         }

@@ -141,6 +141,10 @@ public class MongoDBConfig {
         return addPrefixToTableName(tableName);
     }
 
+    public String getJWTSigningKeysCollection() {
+        return addPrefixToTableName("jwt_signing_keys");
+    }
+
     private String addPrefixToTableName(String tableName) {
         if (!mongodb_collection_names_prefix.trim().equals("")) {
             return mongodb_collection_names_prefix.trim() + "_" + tableName;
