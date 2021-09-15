@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0]
+
+### Changed
+
+- Updated to match 2.9 plugin interface to support multiple access token signing keys: https://github.com/supertokens/supertokens-core/issues/305
+- Added new type of key into KeyValue collection and the handler methods
+
 ## [1.8.0] - 2021-06-23
 ### Changed
 - Uses new plugin interface

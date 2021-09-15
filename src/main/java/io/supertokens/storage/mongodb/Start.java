@@ -18,6 +18,9 @@
 package io.supertokens.storage.mongodb;
 
 import ch.qos.logback.classic.Logger;
+
+import java.util.List;
+
 import com.google.gson.JsonObject;
 import com.mongodb.MongoException;
 import io.supertokens.pluginInterface.KeyValueInfo;
@@ -39,6 +42,7 @@ public class Start implements SessionNoSQLStorage_1 {
     private String processId;
     private MongoDBLoggingAppender appender = new MongoDBLoggingAppender(this);
     private static final String APP_ID_KEY_NAME = "app_id";
+    private static final String ACCESS_TOKEN_SIGNING_KEY_LIST_NAME = "access_token_signing_key_list";
     private static final String ACCESS_TOKEN_SIGNING_KEY_NAME = "access_token_signing_key";
     private static final String REFRESH_TOKEN_KEY_NAME = "refresh_token_key";
     public static boolean isTesting = false;
@@ -170,15 +174,48 @@ public class Start implements SessionNoSQLStorage_1 {
     }
 
     @Override
-    public KeyValueInfoWithLastUpdated getAccessTokenSigningKey_Transaction() throws StorageQueryException {
+    public KeyValueInfoWithLastUpdated getLegacyAccessTokenSigningKey_Transaction() throws StorageQueryException {
         return getKeyValue_Transaction(ACCESS_TOKEN_SIGNING_KEY_NAME);
     }
 
     @Override
-    public boolean setAccessTokenSigningKey_Transaction(KeyValueInfoWithLastUpdated info)
-            throws StorageQueryException {
-        return setKeyValue_Transaction(ACCESS_TOKEN_SIGNING_KEY_NAME, info);
+    public void removeLegacyAccessTokenSigningKey_Transaction() throws StorageQueryException {
+        Queries.deleteKeyValue(this, ACCESS_TOKEN_SIGNING_KEY_NAME);
     }
+
+    @Override
+    public KeyValueInfo[] getAccessTokenSigningKeys_Transaction() throws StorageQueryException {
+        try {
+            List<KeyValueInfo> keyList = Queries.getArrayKeyValue_Transaction(this, ACCESS_TOKEN_SIGNING_KEY_LIST_NAME);
+            if (keyList == null) {
+                return new KeyValueInfo[0];
+            }
+            return keyList.toArray(new KeyValueInfo[keyList.size()]);
+        } catch (MongoException e) {
+            throw new StorageQueryException(e);
+        }
+    }
+
+    @Override
+    public boolean addAccessTokenSigningKey_Transaction(KeyValueInfo info, Long lastCreated)
+            throws StorageQueryException {
+        try {
+            return Queries.addArrayKeyValue_Transaction(this, ACCESS_TOKEN_SIGNING_KEY_LIST_NAME, info, lastCreated);
+        } catch (MongoException e) {
+            throw new StorageQueryException(e);
+        }
+    }
+
+    @Override
+    public void removeAccessTokenSigningKeysBefore(long time)
+            throws StorageQueryException {
+        try {
+            Queries.removeArrayKeyValuesBefore(this, ACCESS_TOKEN_SIGNING_KEY_LIST_NAME, time);
+        } catch (MongoException e) {
+            throw new StorageQueryException(e);
+        }
+    }
+
 
     public ResourceDistributor getResourceDistributor() {
         return resourceDistributor;
