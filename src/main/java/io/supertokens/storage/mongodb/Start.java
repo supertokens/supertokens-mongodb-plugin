@@ -187,9 +187,6 @@ public class Start implements SessionNoSQLStorage_1 {
     public KeyValueInfo[] getAccessTokenSigningKeys_Transaction() throws StorageQueryException {
         try {
             List<KeyValueInfo> keyList = Queries.getArrayKeyValue_Transaction(this, ACCESS_TOKEN_SIGNING_KEY_LIST_NAME);
-            if (keyList == null) {
-                return new KeyValueInfo[0];
-            }
             return keyList.toArray(new KeyValueInfo[keyList.size()]);
         } catch (MongoException e) {
             throw new StorageQueryException(e);

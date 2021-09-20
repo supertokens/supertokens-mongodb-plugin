@@ -170,7 +170,7 @@ public class Queries {
         MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
         Document result = (Document) collection.find(Filters.eq("_id", key)).first();
         if (result == null) {
-            return null;
+            return new ArrayList<KeyValueInfo>();
         }
         return KeyValueInfoArrayRowMapper.getInstance().mapOrThrow(result);
     }
