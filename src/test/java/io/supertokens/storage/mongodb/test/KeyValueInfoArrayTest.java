@@ -17,36 +17,18 @@
 
 package io.supertokens.storage.mongodb.test;
 
-import com.google.gson.JsonObject;
 import io.supertokens.ProcessState;
 import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.STORAGE_TYPE;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
-import io.supertokens.pluginInterface.exceptions.StorageTransactionLogicException;
-import io.supertokens.pluginInterface.noSqlStorage.NoSQLStorage_1;
 import io.supertokens.pluginInterface.session.SessionStorage;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionNoSQLStorage_1;
-import io.supertokens.session.Session;
-import io.supertokens.session.accessToken.AccessTokenSigningKey;
-import io.supertokens.session.accessToken.AccessTokenSigningKey.KeyInfo;
-import io.supertokens.session.info.SessionInformationHolder;
 import io.supertokens.storageLayer.StorageLayer;
-import junit.framework.TestCase;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -68,10 +50,7 @@ public class KeyValueInfoArrayTest {
 
     @Test
     public void checkThatAddWorksWorksWithNullLastCreated()
-            throws InterruptedException, StorageQueryException, NoSuchAlgorithmException, InvalidKeyException,
-            SignatureException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException,
-            UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
-            StorageTransactionLogicException {
+            throws InterruptedException, StorageQueryException {
         String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -81,22 +60,22 @@ public class KeyValueInfoArrayTest {
             return;
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
-        
+
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
 
         assertFalse(noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L));
         assertFalse(noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), null));
-        
+
         KeyValueInfo[] allKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
         assertEquals(allKeys.length, 1);
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
     @Test
     public void checkThatAddWorksWorksWithWrongLastCreated()
-            throws InterruptedException, StorageQueryException, NoSuchAlgorithmException, InvalidKeyException,
-            SignatureException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException,
-            UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
-            StorageTransactionLogicException {
+            throws InterruptedException, StorageQueryException {
         String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -106,21 +85,21 @@ public class KeyValueInfoArrayTest {
             return;
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
-        
+
         assertFalse(noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L));
         assertEquals(noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction().length, 0);
 
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
         assertFalse(noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), null));
         assertEquals(noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction().length, 1);
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
     @Test
     public void checkThatAddWorksWithCorrectLastCreated()
-            throws InterruptedException, StorageQueryException, NoSuchAlgorithmException, InvalidKeyException,
-            SignatureException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException,
-            UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
-            StorageTransactionLogicException {
+            throws InterruptedException, StorageQueryException {
         String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -130,11 +109,11 @@ public class KeyValueInfoArrayTest {
             return;
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
-        
+
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key2", 101), 100L);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L);
-        
+
         KeyValueInfo[] allKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
         assertEquals(allKeys.length, 3);
 
@@ -145,14 +124,14 @@ public class KeyValueInfoArrayTest {
         assertEquals(allKeys[0].createdAtTime, 200);
         assertEquals(allKeys[1].createdAtTime, 101);
         assertEquals(allKeys[2].createdAtTime, 100);
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
     @Test
     public void checkRemoveAccessTokenSigningKeysBefore()
-            throws InterruptedException, StorageQueryException, NoSuchAlgorithmException, InvalidKeyException,
-            SignatureException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException,
-            UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
-            StorageTransactionLogicException {
+            throws InterruptedException, StorageQueryException {
         String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -162,17 +141,20 @@ public class KeyValueInfoArrayTest {
             return;
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
-        
+
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key2", 101), 100L);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L);
 
         noSQLSessionStorage_1.removeAccessTokenSigningKeysBefore(199);
-        
+
         KeyValueInfo[] cleanedKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
         assertEquals(cleanedKeys.length, 1);
         assertEquals(cleanedKeys[0].value, "key3");
         assertEquals(cleanedKeys[0].createdAtTime, 200);
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
 }
