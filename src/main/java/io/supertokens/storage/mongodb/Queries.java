@@ -63,6 +63,10 @@ public class Queries {
             MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
             collection.deleteMany(new Document());
         }
+        {
+            MongoCollection collection = client.getCollection(Config.getConfig(start).getJWTSigningKeysCollection());
+            collection.deleteMany(new Document());
+        }
     }
 
     private static boolean isDuplicateKeyException(Exception e) {

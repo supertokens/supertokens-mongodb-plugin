@@ -27,14 +27,20 @@ import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
 import io.supertokens.pluginInterface.STORAGE_TYPE;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
+import io.supertokens.pluginInterface.jwt.JWTSigningKeyInfo;
+import io.supertokens.pluginInterface.jwt.exceptions.DuplicateKeyIdException;
+import io.supertokens.pluginInterface.jwt.nosqlstorage.JWTRecipeNoSQLStorage_1;
 import io.supertokens.pluginInterface.session.SessionInfo;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionInfoWithLastUpdated;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionNoSQLStorage_1;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.output.Logging;
+import io.supertokens.storage.mongodb.queries.JWTSigningQueries;
 import org.slf4j.LoggerFactory;
 
-public class Start implements SessionNoSQLStorage_1 {
+import java.util.List;
+
+public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     private static final Object appenderLock = new Object();
     public static boolean silent = false;
@@ -343,4 +349,28 @@ public class Start implements SessionNoSQLStorage_1 {
         return Config.canBeUsed(configFilePath);
     }
 
+    @Override
+    public List<JWTSigningKeyInfo> getJWTSigningKeys_Transaction() throws StorageQueryException {
+        try {
+            return JWTSigningQueries.getJWTSigningKeys_Transaction(this);
+        } catch (MongoException e) {
+            throw new StorageQueryException(e);
+        }
+    }
+
+    @Override
+    public boolean setJWTSigningKeyInfoIfNoKeyForAlgorithmExists_Transaction(JWTSigningKeyInfo keyInfo)
+            throws StorageQueryException, DuplicateKeyIdException {
+        try {
+            return JWTSigningQueries.setJWTSigningKeyInfoIfNoKeyForAlgorithmExists_Transaction(this, keyInfo);
+        } catch (MongoException e) {
+
+            if (e.getMessage().contains("(DuplicateKey)")
+                    && e.getMessage().contains(Config.getConfig(this).getDatabaseName() + "." + Config.getConfig(this).getJWTSigningKeysCollection())) {
+                throw new DuplicateKeyIdException();
+            }
+
+            throw new StorageQueryException(e);
+        }
+    }
 }
