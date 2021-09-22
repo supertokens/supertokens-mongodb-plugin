@@ -25,7 +25,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.PushOptions;
 import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import io.supertokens.pluginInterface.KeyValueInfo;
@@ -36,12 +38,17 @@ import io.supertokens.pluginInterface.session.SessionInfo;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionInfoWithLastUpdated;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.utils.Utils;
+import org.bson.BsonArray;
+import org.bson.BsonDocument;
+import org.bson.BsonValue;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Queries {
 
@@ -153,6 +160,87 @@ public class Queries {
             return null;
         }
         return KeyValueInfoLastUpdatedRowMapper.getInstance().mapOrThrow(result);
+    }
+
+    static void deleteKeyValue(Start start, String key) {
+        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
+        MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
+
+        collection.deleteOne(Filters.eq("_id", key));
+    }
+    
+    static List<KeyValueInfo> getArrayKeyValue_Transaction(Start start, String key) throws StorageQueryException{
+        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
+        MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
+        Document result = (Document) collection.find(Filters.eq("_id", key)).first();
+        if (result == null) {
+            return new ArrayList<KeyValueInfo>();
+        }
+        return KeyValueInfoArrayRowMapper.getInstance().mapOrThrow(result);
+    }
+
+    static boolean removeArrayKeyValuesBefore(Start start, String key, long time) throws StorageQueryException{
+        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
+        MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
+
+        UpdateResult result = collection.updateOne(
+            Filters.eq("_id", key),
+            Updates.pullByFilter(new Document("keys", Filters.lte("created_at_time", time)))
+        );
+
+        return result.getModifiedCount() == 1;
+    }
+
+    @SuppressWarnings("unchecked")
+    static boolean addArrayKeyValue_Transaction(Start start, String key, KeyValueInfo info, Long lastCreated) {
+        // here we want to do something like upsert, but not exactly that since if the user has specificed info
+        // .lastUpdatedSign, then it must only be an update operation and it should not create a new document. So we
+        // do an update if that is not null. Else we do an insert.
+
+        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
+        MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
+
+        List<Document> keyList = Collections.singletonList(
+            new Document("value", info.value)
+                .append("created_at_time", info.createdAtTime)
+        );
+
+        if (lastCreated != null) {
+            // here we only want to update an existing key value. We do not do upsert since we know that this key
+            // already
+            // exists. If it does not, we should not do anything and return false (since it's a part of a
+            // "transaction").
+
+            UpdateResult result = collection.updateOne(
+                    Filters.and(
+                        Filters.eq("_id", key),
+                        Filters.eq("keys.0.created_at_time", lastCreated)
+                    ),
+                    // We have to use a pushEach with here, because it allows us to set where we push the value
+                    Updates.pushEach("keys", keyList, new PushOptions().position(0)),
+                    new UpdateOptions().upsert(false)
+            );
+            // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
+
+            return result.getModifiedCount() == 1;
+        } else {
+
+            try {
+                collection.insertOne(
+                        new Document("_id", key)
+                                .append("keys", keyList)
+                );
+
+                // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
+                return true;
+            } catch (MongoException e) {
+                if (!isDuplicateKeyException(e)) {
+                    throw e;
+                }
+            }
+
+            return false;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -354,6 +442,24 @@ public class Queries {
                 jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
                 result.getLong("created_at_time"),
                 result.getString("last_updated_sign"));
+        }
+    }
+
+    private static class KeyValueInfoArrayRowMapper implements RowMapper<List<KeyValueInfo>, Document> {
+        private static final KeyValueInfoArrayRowMapper INSTANCE = new KeyValueInfoArrayRowMapper();
+
+        private KeyValueInfoArrayRowMapper(){
+        }
+
+        private static KeyValueInfoArrayRowMapper getInstance(){
+            return INSTANCE;
+        }
+
+        @Override
+        public List<KeyValueInfo> map(Document result) throws Exception {
+            return result.getList("keys", Document.class).stream()
+                .map((Document subDoc) -> new KeyValueInfo(subDoc.getString("value"), subDoc.getLong("created_at_time")))
+                .collect(Collectors.toList());
         }
     }
 }
