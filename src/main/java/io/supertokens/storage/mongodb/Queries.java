@@ -88,15 +88,11 @@ public class Queries {
             // exists. If it does not, we should not do anything and return false (since it's a part of a
             // "transaction").
             Document toUpdate = new Document("$set", new Document("value", info.value)
-                    .append("created_at_time", info.createdAtTime)
-                    .append("last_updated_sign", Utils.getUUID()));
+                    .append("created_at_time", info.createdAtTime).append("last_updated_sign", Utils.getUUID()));
 
             UpdateResult result = collection.updateOne(
-                    Filters.and(Filters.eq("_id", key),
-                            Filters.eq("last_updated_sign", info.lastUpdatedSign)),
-                    toUpdate,
-                    new UpdateOptions().upsert(false)
-            );
+                    Filters.and(Filters.eq("_id", key), Filters.eq("last_updated_sign", info.lastUpdatedSign)),
+                    toUpdate, new UpdateOptions().upsert(false));
             // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
 
             return result.getModifiedCount() == 1;
@@ -104,12 +100,8 @@ public class Queries {
         } else {
 
             try {
-                collection.insertOne(
-                        new Document("_id", key)
-                                .append("value", info.value)
-                                .append("created_at_time", info.createdAtTime)
-                                .append("last_updated_sign", Utils.getUUID())
-                );
+                collection.insertOne(new Document("_id", key).append("value", info.value)
+                        .append("created_at_time", info.createdAtTime).append("last_updated_sign", Utils.getUUID()));
 
                 // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
                 return true;
@@ -129,22 +121,28 @@ public class Queries {
         MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
 
         Document toUpdate = new Document("$set", new Document("value", info.value)
-                .append("created_at_time", info.createdAtTime)
-                .append("last_updated_sign", Utils.getUUID()));
+                .append("created_at_time", info.createdAtTime).append("last_updated_sign", Utils.getUUID()));
 
-        UpdateResult result = collection.updateOne(Filters.eq("_id", key),
-                toUpdate,
-                new UpdateOptions().upsert(true));    // the document will be created based on the _id filter above
+        UpdateResult result = collection.updateOne(Filters.eq("_id", key), toUpdate, new UpdateOptions().upsert(true)); // the
+                                                                                                                        // document
+                                                                                                                        // will
+                                                                                                                        // be
+                                                                                                                        // created
+                                                                                                                        // based
+                                                                                                                        // on
+                                                                                                                        // the
+                                                                                                                        // _id
+                                                                                                                        // filter
+                                                                                                                        // above
 
         // TODO: supposed to call the below functions only if result.wasAcknowledged() is true. Why?
 
         if (result.getModifiedCount() != 1 && result.getUpsertedId() == null) {
-            throw new MongoException(
-                    "update / insert failed");
+            throw new MongoException("update / insert failed");
         }
     }
 
-    static KeyValueInfo getKeyValue(Start start, String key) throws StorageQueryException{
+    static KeyValueInfo getKeyValue(Start start, String key) throws StorageQueryException {
         KeyValueInfoWithLastUpdated result = getKeyValue_Transaction(start, key);
         if (result == null) {
             return null;
@@ -152,7 +150,7 @@ public class Queries {
         return new KeyValueInfo(result.value, result.createdAtTime);
     }
 
-    static KeyValueInfoWithLastUpdated getKeyValue_Transaction(Start start, String key) throws StorageQueryException{
+    static KeyValueInfoWithLastUpdated getKeyValue_Transaction(Start start, String key) throws StorageQueryException {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
         Document result = (Document) collection.find(Filters.eq("_id", key)).first();
@@ -168,8 +166,8 @@ public class Queries {
 
         collection.deleteOne(Filters.eq("_id", key));
     }
-    
-    static List<KeyValueInfo> getArrayKeyValue_Transaction(Start start, String key) throws StorageQueryException{
+
+    static List<KeyValueInfo> getArrayKeyValue_Transaction(Start start, String key) throws StorageQueryException {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
         Document result = (Document) collection.find(Filters.eq("_id", key)).first();
@@ -179,14 +177,12 @@ public class Queries {
         return KeyValueInfoArrayRowMapper.getInstance().mapOrThrow(result);
     }
 
-    static boolean removeArrayKeyValuesBefore(Start start, String key, long time) throws StorageQueryException{
+    static boolean removeArrayKeyValuesBefore(Start start, String key, long time) throws StorageQueryException {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
 
-        UpdateResult result = collection.updateOne(
-            Filters.eq("_id", key),
-            Updates.pullByFilter(new Document("keys", Filters.lte("created_at_time", time)))
-        );
+        UpdateResult result = collection.updateOne(Filters.eq("_id", key),
+                Updates.pullByFilter(new Document("keys", Filters.lte("created_at_time", time))));
 
         return result.getModifiedCount() == 1;
     }
@@ -200,10 +196,8 @@ public class Queries {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getKeyValueCollection());
 
-        List<Document> keyList = Collections.singletonList(
-            new Document("value", info.value)
-                .append("created_at_time", info.createdAtTime)
-        );
+        List<Document> keyList = Collections
+                .singletonList(new Document("value", info.value).append("created_at_time", info.createdAtTime));
 
         if (lastCreated != null) {
             // here we only want to update an existing key value. We do not do upsert since we know that this key
@@ -212,24 +206,17 @@ public class Queries {
             // "transaction").
 
             UpdateResult result = collection.updateOne(
-                    Filters.and(
-                        Filters.eq("_id", key),
-                        Filters.eq("keys.0.created_at_time", lastCreated)
-                    ),
+                    Filters.and(Filters.eq("_id", key), Filters.eq("keys.0.created_at_time", lastCreated)),
                     // We have to use a pushEach with here, because it allows us to set where we push the value
                     Updates.pushEach("keys", keyList, new PushOptions().position(0)),
-                    new UpdateOptions().upsert(false)
-            );
+                    new UpdateOptions().upsert(false));
             // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
 
             return result.getModifiedCount() == 1;
         } else {
 
             try {
-                collection.insertOne(
-                        new Document("_id", key)
-                                .append("keys", keyList)
-                );
+                collection.insertOne(new Document("_id", key).append("keys", keyList));
 
                 // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
                 return true;
@@ -245,22 +232,18 @@ public class Queries {
 
     @SuppressWarnings("unchecked")
     static void createNewSession(Start start, String sessionHandle, String userId, String refreshTokenHash2,
-                                 JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT,
-                                 long createdAtTime) {
+            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
-        collection.insertOne(new Document("_id", sessionHandle)
-                .append("user_id", userId)
-                .append("refresh_token_hash_2", refreshTokenHash2)
-                .append("session_data", userDataInDatabase.toString())
-                .append("expires_at", expiry)
-                .append("jwt_user_payload", userDataInJWT.toString())
-                .append("created_at_time", createdAtTime)
-                .append("last_updated_sign", Utils.getUUID()));
+        collection.insertOne(new Document("_id", sessionHandle).append("user_id", userId)
+                .append("refresh_token_hash_2", refreshTokenHash2).append("session_data", userDataInDatabase.toString())
+                .append("expires_at", expiry).append("jwt_user_payload", userDataInJWT.toString())
+                .append("created_at_time", createdAtTime).append("last_updated_sign", Utils.getUUID()));
     }
 
-    static SessionInfoWithLastUpdated getSessionInfo_Transaction(Start start, String sessionHandle) throws StorageQueryException{
+    static SessionInfoWithLastUpdated getSessionInfo_Transaction(Start start, String sessionHandle)
+            throws StorageQueryException {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
@@ -272,9 +255,8 @@ public class Queries {
         return SessionInfoLastUpdatedRowMapper.getInstance().mapOrThrow(result);
     }
 
-    static boolean updateSessionInfo_Transaction(Start start, String sessionHandle,
-                                                 String refreshTokenHash2, long expiry, String lastUpdatedSign)
-            throws StorageQueryException {
+    static boolean updateSessionInfo_Transaction(Start start, String sessionHandle, String refreshTokenHash2,
+            long expiry, String lastUpdatedSign) throws StorageQueryException {
 
         if (lastUpdatedSign == null) {
             throw new StorageQueryException(new Exception("lastUpdatedSign cannot be null for this update operation"));
@@ -284,15 +266,11 @@ public class Queries {
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
         Document toUpdate = new Document("$set", new Document("refresh_token_hash_2", refreshTokenHash2)
-                .append("expires_at", expiry)
-                .append("last_updated_sign", Utils.getUUID()));
+                .append("expires_at", expiry).append("last_updated_sign", Utils.getUUID()));
 
         UpdateResult result = collection.updateOne(
-                Filters.and(Filters.eq("_id", sessionHandle),
-                        Filters.eq("last_updated_sign", lastUpdatedSign)),
-                toUpdate,
-                new UpdateOptions().upsert(false)
-        );
+                Filters.and(Filters.eq("_id", sessionHandle), Filters.eq("last_updated_sign", lastUpdatedSign)),
+                toUpdate, new UpdateOptions().upsert(false));
         // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
 
         return result.getModifiedCount() == 1;
@@ -302,7 +280,7 @@ public class Queries {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
-        return Math.toIntExact(collection.countDocuments());    // this is only used in testing, so this is OK.
+        return Math.toIntExact(collection.countDocuments()); // this is only used in testing, so this is OK.
     }
 
     static int deleteSession(Start start, String[] sessionHandles) {
@@ -354,10 +332,10 @@ public class Queries {
             return null;
         }
         return SessionInfoRowMapper.getInstance().mapOrThrow(result);
-   }
+    }
 
     static int updateSession(Start start, String sessionHandle, @Nullable JsonObject sessionData,
-                             @Nullable JsonObject jwtData) throws StorageQueryException {
+            @Nullable JsonObject jwtData) throws StorageQueryException {
 
         if (sessionData == null && jwtData == null) {
             throw new StorageQueryException(new Exception("sessionData and jwtData are null"));
@@ -374,11 +352,8 @@ public class Queries {
             updated.append("jwt_user_payload", jwtData.toString());
         }
 
-        UpdateResult result = collection.updateOne(
-                Filters.eq("_id", sessionHandle),
-                new Document("$set", updated),
-                new UpdateOptions().upsert(false)
-        );
+        UpdateResult result = collection.updateOne(Filters.eq("_id", sessionHandle), new Document("$set", updated),
+                new UpdateOptions().upsert(false));
         // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
 
         return result.getModifiedCount() == 1 ? 1 : 0;
@@ -387,7 +362,8 @@ public class Queries {
     private static class SessionInfoRowMapper implements RowMapper<SessionInfo, Document> {
         private static final SessionInfoRowMapper INSTANCE = new SessionInfoRowMapper();
 
-        private SessionInfoRowMapper() {}
+        private SessionInfoRowMapper() {
+        }
 
         private static SessionInfoRowMapper getInstance() {
             return INSTANCE;
@@ -397,38 +373,37 @@ public class Queries {
         public SessionInfo map(Document result) throws Exception {
             JsonParser jp = new JsonParser();
             return new SessionInfo(result.getString("_id"), result.getString("user_id"),
-                result.getString("refresh_token_hash_2"),
-                jp.parse(result.getString("session_data")).getAsJsonObject(),
-                result.getLong("expires_at"),
-                jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
-                result.getLong("created_at_time"));
+                    result.getString("refresh_token_hash_2"),
+                    jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
+                    jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
+                    result.getLong("created_at_time"));
         }
     }
 
     private static class KeyValueInfoLastUpdatedRowMapper implements RowMapper<KeyValueInfoWithLastUpdated, Document> {
         private static final KeyValueInfoLastUpdatedRowMapper INSTANCE = new KeyValueInfoLastUpdatedRowMapper();
 
-        private KeyValueInfoLastUpdatedRowMapper(){
+        private KeyValueInfoLastUpdatedRowMapper() {
         }
 
-        private static KeyValueInfoLastUpdatedRowMapper getInstance(){
+        private static KeyValueInfoLastUpdatedRowMapper getInstance() {
             return INSTANCE;
         }
 
         @Override
         public KeyValueInfoWithLastUpdated map(Document result) throws Exception {
             return new KeyValueInfoWithLastUpdated(result.getString("value"), result.getLong("created_at_time"),
-                result.getString("last_updated_sign"));
+                    result.getString("last_updated_sign"));
         }
     }
 
     private static class SessionInfoLastUpdatedRowMapper implements RowMapper<SessionInfoWithLastUpdated, Document> {
         private static final SessionInfoLastUpdatedRowMapper INSTANCE = new SessionInfoLastUpdatedRowMapper();
 
-        private SessionInfoLastUpdatedRowMapper(){
+        private SessionInfoLastUpdatedRowMapper() {
         }
 
-        private static SessionInfoLastUpdatedRowMapper getInstance(){
+        private static SessionInfoLastUpdatedRowMapper getInstance() {
             return INSTANCE;
         }
 
@@ -436,30 +411,28 @@ public class Queries {
         public SessionInfoWithLastUpdated map(Document result) throws Exception {
             JsonParser jp = new JsonParser();
             return new SessionInfoWithLastUpdated(result.getString("_id"), result.getString("user_id"),
-                result.getString("refresh_token_hash_2"),
-                jp.parse(result.getString("session_data")).getAsJsonObject(),
-                result.getLong("expires_at"),
-                jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
-                result.getLong("created_at_time"),
-                result.getString("last_updated_sign"));
+                    result.getString("refresh_token_hash_2"),
+                    jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
+                    jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(), result.getLong("created_at_time"),
+                    result.getString("last_updated_sign"));
         }
     }
 
     private static class KeyValueInfoArrayRowMapper implements RowMapper<List<KeyValueInfo>, Document> {
         private static final KeyValueInfoArrayRowMapper INSTANCE = new KeyValueInfoArrayRowMapper();
 
-        private KeyValueInfoArrayRowMapper(){
+        private KeyValueInfoArrayRowMapper() {
         }
 
-        private static KeyValueInfoArrayRowMapper getInstance(){
+        private static KeyValueInfoArrayRowMapper getInstance() {
             return INSTANCE;
         }
 
         @Override
         public List<KeyValueInfo> map(Document result) throws Exception {
-            return result.getList("keys", Document.class).stream()
-                .map((Document subDoc) -> new KeyValueInfo(subDoc.getString("value"), subDoc.getLong("created_at_time")))
-                .collect(Collectors.toList());
+            return result.getList("keys", Document.class).stream().map(
+                    (Document subDoc) -> new KeyValueInfo(subDoc.getString("value"), subDoc.getLong("created_at_time")))
+                    .collect(Collectors.toList());
         }
     }
 }

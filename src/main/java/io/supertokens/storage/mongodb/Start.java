@@ -130,23 +130,19 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
         }
     }
 
-
     @Override
-    public boolean updateSessionInfo_Transaction(String sessionHandle,
-                                                 String refreshTokenHash2, long expiry, String lastUpdatedSign)
-            throws StorageQueryException {
+    public boolean updateSessionInfo_Transaction(String sessionHandle, String refreshTokenHash2, long expiry,
+            String lastUpdatedSign) throws StorageQueryException {
         try {
-            return Queries
-                    .updateSessionInfo_Transaction(this, sessionHandle, refreshTokenHash2, expiry, lastUpdatedSign);
+            return Queries.updateSessionInfo_Transaction(this, sessionHandle, refreshTokenHash2, expiry,
+                    lastUpdatedSign);
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }
     }
 
-
     @Override
-    public SessionInfoWithLastUpdated getSessionInfo_Transaction(String sessionHandle)
-            throws StorageQueryException {
+    public SessionInfoWithLastUpdated getSessionInfo_Transaction(String sessionHandle) throws StorageQueryException {
         try {
             return Queries.getSessionInfo_Transaction(this, sessionHandle);
         } catch (MongoException e) {
@@ -156,8 +152,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public void createNewSession(String sessionHandle, String userId, String refreshTokenHash2,
-                                 JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT,
-                                 long createdAtTime)
+            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime)
             throws StorageQueryException {
         try {
             Queries.createNewSession(this, sessionHandle, userId, refreshTokenHash2, userDataInDatabase, expiry,
@@ -168,8 +163,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public KeyValueInfoWithLastUpdated getRefreshTokenSigningKey_Transaction() throws
-            StorageQueryException {
+    public KeyValueInfoWithLastUpdated getRefreshTokenSigningKey_Transaction() throws StorageQueryException {
         return getKeyValue_Transaction(REFRESH_TOKEN_KEY_NAME);
     }
 
@@ -210,15 +204,13 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void removeAccessTokenSigningKeysBefore(long time)
-            throws StorageQueryException {
+    public void removeAccessTokenSigningKeysBefore(long time) throws StorageQueryException {
         try {
             Queries.removeArrayKeyValuesBefore(this, ACCESS_TOKEN_SIGNING_KEY_LIST_NAME, time);
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }
     }
-
 
     public ResourceDistributor getResourceDistributor() {
         return resourceDistributor;
@@ -306,8 +298,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public boolean setKeyValue_Transaction(String key, KeyValueInfoWithLastUpdated info)
-            throws StorageQueryException {
+    public boolean setKeyValue_Transaction(String key, KeyValueInfoWithLastUpdated info) throws StorageQueryException {
         try {
             return Queries.setKeyValue_Transaction(this, key, info);
         } catch (MongoException e) {
@@ -366,7 +357,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
         } catch (MongoException e) {
 
             if (e.getMessage().contains("(DuplicateKey)")
-                    && e.getMessage().contains(Config.getConfig(this).getDatabaseName() + "." + Config.getConfig(this).getJWTSigningKeysCollection())) {
+                    && e.getMessage().contains(Config.getConfig(this).getDatabaseName() + "."
+                            + Config.getConfig(this).getJWTSigningKeysCollection())) {
                 throw new DuplicateKeyIdException();
             }
 

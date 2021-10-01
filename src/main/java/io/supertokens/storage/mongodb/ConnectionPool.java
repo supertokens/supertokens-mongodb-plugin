@@ -84,10 +84,10 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
 
         }
 
-        mongoClient = MongoClients.create(MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString(connectionURI))
-                .applyToClusterSettings(builder -> builder.serverSelectionTimeout(5000, TimeUnit.MILLISECONDS))
-                .build());
+        mongoClient = MongoClients
+                .create(MongoClientSettings.builder().applyConnectionString(new ConnectionString(connectionURI))
+                        .applyToClusterSettings(builder -> builder.serverSelectionTimeout(5000, TimeUnit.MILLISECONDS))
+                        .build());
 
         // we have this below because there is a chance where this server is started before mongodb. So we must wait
         // for that to start, else this service will crash.
@@ -141,20 +141,16 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
         Logging.info(start, "Setting up MongoDB connection.");
         boolean longMessagePrinted = false;
         long maxTryTime = System.currentTimeMillis() + getTimeToWaitToInit(start);
-        String errorMessage =
-                "Error connecting to MongoDB instance. Please make sure that MongoDB is running and that " +
-                        "you have" +
-                        " specified the correct value for 'mongodb_connection_uri' in your " +
-                        "config file";
+        String errorMessage = "Error connecting to MongoDB instance. Please make sure that MongoDB is running and that "
+                + "you have" + " specified the correct value for 'mongodb_connection_uri' in your " + "config file";
         try {
             while (true) {
                 try {
                     start.getResourceDistributor().setResource(RESOURCE_KEY, new ConnectionPool(start));
                     break;
                 } catch (Exception e) {
-                    if (e.getMessage().contains("Connection refused") ||
-                            (e instanceof com.mongodb.MongoTimeoutException &&
-                                    e.getMessage().contains("Prematurely reached end of stream"))) {
+                    if (e.getMessage().contains("Connection refused") || (e instanceof com.mongodb.MongoTimeoutException
+                            && e.getMessage().contains("Prematurely reached end of stream"))) {
                         start.handleKillSignalForWhenItHappens();
                         if (System.currentTimeMillis() > maxTryTime) {
                             throw new QuitProgramFromPluginException(errorMessage);
