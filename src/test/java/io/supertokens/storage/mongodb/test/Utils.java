@@ -131,7 +131,6 @@ abstract class Utils extends Mockito {
             }
         }
 
-
     }
 
     static TestRule getOnFailure() {

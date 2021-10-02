@@ -53,7 +53,7 @@ public class LoggingTest {
 
     @Test
     public void defaultLogging() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -96,7 +96,7 @@ public class LoggingTest {
     @Test
     public void customLogging() throws Exception {
         try {
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("info_log_path", "\"tempLogging/info.log\"");
             Utils.setValueInConfig("error_log_path", "\"tempLogging/error.log\"");
@@ -143,12 +143,11 @@ public class LoggingTest {
 
         }
 
-
     }
 
     @Test
     public void confirmLoggerClosed() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -164,20 +163,18 @@ public class LoggingTest {
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
 
-        assertTrue(!mongoInfo.iteratorForAppenders().hasNext() && !mongoError.iteratorForAppenders()
-                .hasNext());
+        assertTrue(!mongoInfo.iteratorForAppenders().hasNext() && !mongoError.iteratorForAppenders().hasNext());
 
     }
 
     @Test
     public void testStandardOutLoggingWithNullStr() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
         ByteArrayOutputStream stdOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
 
         Utils.setValueInConfig("info_log_path", "\"null\"");
         Utils.setValueInConfig("error_log_path", "\"null\"");
-
 
         System.setOut(new PrintStream(stdOutput));
         System.setErr(new PrintStream(errorOutput));
@@ -207,13 +204,12 @@ public class LoggingTest {
 
     @Test
     public void testStandardOutLoggingWithNull() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
         ByteArrayOutputStream stdOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
 
         Utils.setValueInConfig("info_log_path", "null");
         Utils.setValueInConfig("error_log_path", "null");
-
 
         System.setOut(new PrintStream(stdOutput));
         System.setErr(new PrintStream(errorOutput));
@@ -241,8 +237,7 @@ public class LoggingTest {
 
     }
 
-    private static boolean fileContainsString(ByteArrayOutputStream log, String value)
-            throws IOException {
+    private static boolean fileContainsString(ByteArrayOutputStream log, String value) throws IOException {
         boolean containsString = false;
         try (BufferedReader reader = new BufferedReader(new StringReader(log.toString()))) {
             String currentReadingLine = reader.readLine();

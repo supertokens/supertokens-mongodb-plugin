@@ -63,12 +63,11 @@ public class InMemoryDBTest {
     public void checkThatInMemDVWorksEvenIfWrongConfig()
             throws InterruptedException, StorageQueryException, NoSuchAlgorithmException, InvalidKeyException,
             SignatureException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException,
-            IOException, InvalidKeySpecException, IllegalBlockSizeException,
-            StorageTransactionLogicException {
+            IOException, InvalidKeySpecException, IllegalBlockSizeException, StorageTransactionLogicException {
         {
             Utils.commentConfigValue("mongodb_connection_uri");
 
-            String[] args = {"../"};
+            String[] args = { "../" };
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -91,7 +90,7 @@ public class InMemoryDBTest {
         }
 
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -103,13 +102,12 @@ public class InMemoryDBTest {
     }
 
     @Test
-    public void checkThatActualDBWorksIfCorrectConfigDev()
-            throws InterruptedException, StorageQueryException, NoSuchAlgorithmException, InvalidKeyException,
-            SignatureException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException,
-            UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
-            StorageTransactionLogicException {
+    public void checkThatActualDBWorksIfCorrectConfigDev() throws InterruptedException, StorageQueryException,
+            NoSuchAlgorithmException, InvalidKeyException, SignatureException, InvalidAlgorithmParameterException,
+            NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException,
+            IllegalBlockSizeException, StorageTransactionLogicException {
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -131,7 +129,7 @@ public class InMemoryDBTest {
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
         }
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -143,13 +141,12 @@ public class InMemoryDBTest {
     }
 
     @Test
-    public void checkThatActualDBWorksIfCorrectConfigProduction()
-            throws InterruptedException, StorageQueryException, NoSuchAlgorithmException, InvalidKeyException,
-            SignatureException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException,
-            UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException,
-            StorageTransactionLogicException {
+    public void checkThatActualDBWorksIfCorrectConfigProduction() throws InterruptedException, StorageQueryException,
+            NoSuchAlgorithmException, InvalidKeyException, SignatureException, InvalidAlgorithmParameterException,
+            NoSuchPaddingException, BadPaddingException, UnsupportedEncodingException, InvalidKeySpecException,
+            IllegalBlockSizeException, StorageTransactionLogicException {
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -171,7 +168,7 @@ public class InMemoryDBTest {
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
         }
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -184,7 +181,7 @@ public class InMemoryDBTest {
 
     @Test
     public void ifForceNoInMemoryThenDevShouldThrowError() throws IOException, InterruptedException {
-        String[] args = {"../", "forceNoInMemDB=true"};
+        String[] args = { "../", "forceNoInMemDB=true" };
 
         Utils.commentConfigValue("mongodb_connection_uri");
 
@@ -193,8 +190,8 @@ public class InMemoryDBTest {
         ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
         assertNotNull(e);
         TestCase.assertEquals(e.exception.getMessage(),
-                "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart " +
-                        "SuperTokens");
+                "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart "
+                        + "SuperTokens");
 
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));

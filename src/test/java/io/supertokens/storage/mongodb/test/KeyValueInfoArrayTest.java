@@ -49,9 +49,8 @@ public class KeyValueInfoArrayTest {
     }
 
     @Test
-    public void checkThatAddWorksWorksWithNullLastCreated()
-            throws InterruptedException, StorageQueryException {
-        String[] args = {"../"};
+    public void checkThatAddWorksWorksWithNullLastCreated() throws InterruptedException, StorageQueryException {
+        String[] args = { "../" };
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -74,9 +73,8 @@ public class KeyValueInfoArrayTest {
     }
 
     @Test
-    public void checkThatAddWorksWorksWithWrongLastCreated()
-            throws InterruptedException, StorageQueryException {
-        String[] args = {"../"};
+    public void checkThatAddWorksWorksWithWrongLastCreated() throws InterruptedException, StorageQueryException {
+        String[] args = { "../" };
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -98,9 +96,8 @@ public class KeyValueInfoArrayTest {
     }
 
     @Test
-    public void checkThatAddWorksWithCorrectLastCreated()
-            throws InterruptedException, StorageQueryException {
-        String[] args = {"../"};
+    public void checkThatAddWorksWithCorrectLastCreated() throws InterruptedException, StorageQueryException {
+        String[] args = { "../" };
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -130,9 +127,8 @@ public class KeyValueInfoArrayTest {
     }
 
     @Test
-    public void checkRemoveAccessTokenSigningKeysBefore()
-            throws InterruptedException, StorageQueryException {
-        String[] args = {"../"};
+    public void checkRemoveAccessTokenSigningKeysBefore() throws InterruptedException, StorageQueryException {
+        String[] args = { "../" };
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 

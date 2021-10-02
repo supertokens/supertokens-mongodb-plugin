@@ -156,16 +156,16 @@ public class MongoDBConfig {
 
         if (mongodb_connection_uri == null) {
             throw new QuitProgramFromPluginException(
-                    "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart " +
-                            "SuperTokens");
+                    "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart "
+                            + "SuperTokens");
         }
 
         try {
             URI ignored = URI.create(mongodb_connection_uri);
         } catch (Exception e) {
             throw new QuitProgramFromPluginException(
-                    "The provided mongodb connection URI has an incorrect format. Please use a format like " +
-                            "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...");
+                    "The provided mongodb connection URI has an incorrect format. Please use a format like "
+                            + "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...");
         }
     }
 

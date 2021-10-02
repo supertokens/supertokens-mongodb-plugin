@@ -54,7 +54,7 @@ public class ConfigTest {
 
     @Test
     public void testThatDefaultConfigLoadsCorrectly() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -68,14 +68,12 @@ public class ConfigTest {
 
     }
 
-
     @Test
     public void testThatMongoSRVConnectionURIWorksCorrectly() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_connection_uri",
                 "\"mongodb+srv://root:root@cluster0.4e3yc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority\"");
-
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -99,14 +97,13 @@ public class ConfigTest {
 
     @Test
     public void testThatMongoOldStyleWithClusterConnectionURIWorksCorrectly() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_connection_uri",
-                "\"mongodb://root:root@cluster0-shard-00-00.4e3yc.mongodb.net:27017,cluster0-shard-00-01.4e3yc" +
-                        ".mongodb.net:27017,cluster0-shard-00-02.4e3yc.mongodb" +
-                        ".net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aqwc94-shard-0&authSource=admin" +
-                        "&retryWrites=true&w=majority\"");
-
+                "\"mongodb://root:root@cluster0-shard-00-00.4e3yc.mongodb.net:27017,cluster0-shard-00-01.4e3yc"
+                        + ".mongodb.net:27017,cluster0-shard-00-02.4e3yc.mongodb"
+                        + ".net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aqwc94-shard-0&authSource=admin"
+                        + "&retryWrites=true&w=majority\"");
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -130,7 +127,7 @@ public class ConfigTest {
 
     @Test
     public void testThatCustomConfigLoadsCorrectly() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_key_value_collection_name", "\"temp_name\"");
 
@@ -144,10 +141,9 @@ public class ConfigTest {
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
-
     @Test
     public void testThatMissingConfigFileThrowsError() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         ProcessBuilder pb = new ProcessBuilder("rm", "-r", "config.yaml");
         pb.directory(new File(args[0]));
@@ -164,12 +160,11 @@ public class ConfigTest {
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
 
-
     }
 
     @Test
     public void testCustomLocationForConfigLoadsCorrectly() throws Exception {
-        String[] args = {"../", "configFile=../temp/config.yaml"};
+        String[] args = { "../", "configFile=../temp/config.yaml" };
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
@@ -179,9 +174,9 @@ public class ConfigTest {
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
 
-        //absolute path
+        // absolute path
         File f = new File("../temp/config.yaml");
-        args = new String[]{"../", "configFile=" + f.getAbsolutePath()};
+        args = new String[] { "../", "configFile=" + f.getAbsolutePath() };
 
         process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -195,7 +190,7 @@ public class ConfigTest {
 
     @Test
     public void testBadPortInput() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost:27018");
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args, false);
@@ -212,8 +207,8 @@ public class ConfigTest {
         ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE, 7000);
         assertNotNull(e);
         assertEquals(e.exception.getMessage(),
-                "Error connecting to MongoDB instance. Please make sure that MongoDB is running and that you have " +
-                        "specified the correct value for 'mongodb_connection_uri' in your config file");
+                "Error connecting to MongoDB instance. Please make sure that MongoDB is running and that you have "
+                        + "specified the correct value for 'mongodb_connection_uri' in your config file");
 
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -221,7 +216,7 @@ public class ConfigTest {
 
     @Test
     public void storageDisabledAndThenEnabled() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args, false);
         process.getProcess().waitToInitStorageModule();
@@ -246,7 +241,7 @@ public class ConfigTest {
 
     @Test
     public void testBadHostInput() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@random:27017");
 
@@ -255,9 +250,9 @@ public class ConfigTest {
         assertNotNull(e);
 
         assertEquals(
-                "Timed out after 5000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, " +
-                        "servers=[{address=random:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb" +
-                        ".MongoSocketException: random}, caused by {java.net.UnknownHostException: random}}]",
+                "Timed out after 5000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, "
+                        + "servers=[{address=random:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb"
+                        + ".MongoSocketException: random}, caused by {java.net.UnknownHostException: random}}]",
                 e.exception.getMessage());
 
         process.kill();
@@ -267,7 +262,7 @@ public class ConfigTest {
 
     @Test
     public void testThatChangeInCollectionNameIsCorrect() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_key_value_collection_name", "key_value_collection");
         Utils.setValueInConfig("mongodb_session_info_collection_name", "session_info_collection");
@@ -287,7 +282,7 @@ public class ConfigTest {
 
     @Test
     public void testAddingTableNamePrefixWorks() throws Exception {
-        String[] args = {"../"};
+        String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_key_value_collection_name", "key_value_table");
         Utils.setValueInConfig("mongodb_collection_names_prefix", "some_prefix");
@@ -307,7 +302,7 @@ public class ConfigTest {
     @Test
     public void testValidConnectionURI() throws Exception {
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost:27017/supertokens");
             Utils.commentConfigValue("mongodb_database_name");
@@ -323,7 +318,7 @@ public class ConfigTest {
 
         {
             Utils.reset();
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost/supertokens");
             Utils.commentConfigValue("mongodb_database_name");
@@ -339,7 +334,7 @@ public class ConfigTest {
 
         {
             Utils.reset();
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("mongodb_connection_uri", "mongodb://localhost:27017/supertokens");
             Utils.commentConfigValue("mongodb_database_name");
@@ -355,7 +350,7 @@ public class ConfigTest {
 
         {
             Utils.reset();
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("mongodb_connection_uri", "mongodb://root:root@localhost:27017");
             Utils.commentConfigValue("mongodb_database_name");
@@ -373,7 +368,7 @@ public class ConfigTest {
     @Test
     public void testInvalidConnectionURI() throws Exception {
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("mongodb_connection_uri", ":/localhost:27017/supertokens");
 
@@ -381,8 +376,8 @@ public class ConfigTest {
             ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
             assertNotNull(e);
             assertEquals(
-                    "The provided mongodb connection URI has an incorrect format. Please use a format like " +
-                            "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...",
+                    "The provided mongodb connection URI has an incorrect format. Please use a format like "
+                            + "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...",
                     e.exception.getMessage());
 
             process.kill();
@@ -394,7 +389,7 @@ public class ConfigTest {
     @Test
     public void testValidConnectionURIAttributes() throws Exception {
         {
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("mongodb_connection_uri",
                     "mongodb://root:root@localhost:27017/supertokens?key1=value1");
@@ -410,11 +405,10 @@ public class ConfigTest {
 
         {
             Utils.reset();
-            String[] args = {"../"};
+            String[] args = { "../" };
 
             Utils.setValueInConfig("mongodb_connection_uri",
-                    "mongodb://root:root@localhost:27017/supertokens?key1=value1&key2" +
-                            "=value2");
+                    "mongodb://root:root@localhost:27017/supertokens?key1=value1&key2" + "=value2");
 
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -428,10 +422,8 @@ public class ConfigTest {
 
     private static void checkConfig(MongoDBConfig config) {
 
-        assertEquals("Config getAttributes did not match default", config.getConnectionAttributes(),
-                "");
-        assertEquals("Config getSchema did not match default", config.getConnectionScheme(),
-                "mongodb");
+        assertEquals("Config getAttributes did not match default", config.getConnectionAttributes(), "");
+        assertEquals("Config getSchema did not match default", config.getConnectionScheme(), "mongodb");
         assertEquals("Config databaseName does not match default", config.getDatabaseName(), "supertokens");
         assertEquals("Config hostName does not match default ", config.getHostName(), "localhost");
         assertEquals("Config port does not match default", config.getPort(), 27017);
