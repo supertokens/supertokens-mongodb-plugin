@@ -38,9 +38,6 @@ import io.supertokens.pluginInterface.session.SessionInfo;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionInfoWithLastUpdated;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.utils.Utils;
-import org.bson.BsonArray;
-import org.bson.BsonDocument;
-import org.bson.BsonValue;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -124,22 +121,28 @@ public class Queries {
                 .append("created_at_time", info.createdAtTime).append("last_updated_sign", Utils.getUUID()));
 
         UpdateResult result = collection.updateOne(Filters.eq("_id", key), toUpdate, new UpdateOptions().upsert(true)); // the
-                                                                                                                        // document
-                                                                                                                        // will
-                                                                                                                        // be
-                                                                                                                        // created
-                                                                                                                        // based
-                                                                                                                        // on
-                                                                                                                        // the
-                                                                                                                        // _id
-                                                                                                                        // filter
-                                                                                                                        // above
+        // document
+        // will
+        // be
+        // created
+        // based
+        // on
+        // the
+        // _id
+        // filter
+        // above
 
         // TODO: supposed to call the below functions only if result.wasAcknowledged() is true. Why?
 
         if (result.getModifiedCount() != 1 && result.getUpsertedId() == null) {
             throw new MongoException("update / insert failed");
         }
+    }
+
+    static void deleteSessionsOfUser(Start start, String userId) {
+        MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
+        MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
+        collection.deleteMany(Filters.eq("user_id", userId));
     }
 
     static KeyValueInfo getKeyValue(Start start, String key) throws StorageQueryException {

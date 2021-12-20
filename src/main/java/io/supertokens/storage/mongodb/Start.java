@@ -18,9 +18,6 @@
 package io.supertokens.storage.mongodb;
 
 import ch.qos.logback.classic.Logger;
-
-import java.util.List;
-
 import com.google.gson.JsonObject;
 import com.mongodb.MongoException;
 import io.supertokens.pluginInterface.KeyValueInfo;
@@ -160,6 +157,11 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }
+    }
+
+    @Override
+    public void deleteSessionsOfUser(String userId) throws StorageQueryException {
+        Queries.deleteSessionsOfUser(this, userId);
     }
 
     @Override
