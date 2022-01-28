@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+-   add workflow to verify if pr title follows conventional commits
+
 ## [1.11.0] - 2022-01-14
 
 ### Changed
