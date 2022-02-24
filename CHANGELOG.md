@@ -12,6 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Uses new plugin interface (v2.12)
+- Add workflow to verify if pr title follows conventional commits
 
 ## [1.11.0] - 2022-01-14
 
