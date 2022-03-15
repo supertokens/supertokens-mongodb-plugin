@@ -153,9 +153,9 @@ public class LoggingTest {
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
         ch.qos.logback.classic.Logger mongoInfo = (ch.qos.logback.classic.Logger) LoggerFactory
-                .getLogger("io.supertokens.storage.mongodb.Info." + process.getProcess().getProcessId());
+                .getLogger("io.supertokens.storage.mongodb.Info");
         ch.qos.logback.classic.Logger mongoError = (ch.qos.logback.classic.Logger) LoggerFactory
-                .getLogger("io.supertokens.storage.mongodb.Error." + process.getProcess().getProcessId());
+                .getLogger("io.supertokens.storage.mongodb.Error");
 
         assertTrue(mongoInfo.iteratorForAppenders().hasNext());
         assertTrue(mongoError.iteratorForAppenders().hasNext());
