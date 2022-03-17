@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.13.0] - 2022-03-17
+
 - Fixes issue with memory leak during tests
+- New plugin version (v2.13)
 
 ## [1.12.0] - 2022-02-24
 
