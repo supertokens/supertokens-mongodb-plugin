@@ -7,6 +7,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.14.0] - 2022-05-05
+- New plugin version (v2.14)
+
 ## [1.13.0] - 2022-03-17
 
 - Fixes issue with memory leak during tests
