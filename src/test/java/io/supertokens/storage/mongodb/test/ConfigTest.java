@@ -73,7 +73,7 @@ public class ConfigTest {
         String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_connection_uri",
-                "\"mongodb+srv://root:root@cluster0.4e3yc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority\"");
+                "\"mongodb+srv://root:root@cluster0.zh79vjj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority\"");
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -100,10 +100,10 @@ public class ConfigTest {
         String[] args = { "../" };
 
         Utils.setValueInConfig("mongodb_connection_uri",
-                "\"mongodb://root:root@cluster0-shard-00-00.4e3yc.mongodb.net:27017,cluster0-shard-00-01.4e3yc"
-                        + ".mongodb.net:27017,cluster0-shard-00-02.4e3yc.mongodb"
-                        + ".net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-aqwc94-shard-0&authSource=admin"
-                        + "&retryWrites=true&w=majority\"");
+                "\"mongodb://root:root@ac-fwlbhn2-shard-00-00.zh79vjj.mongodb.net:27017,ac-fwlbhn2-shard-00-01"
+                        + ".zh79vjj.mongodb.net:27017,ac-fwlbhn2-shard-00-02.zh79vjj.mongodb"
+                        + ".net:27017/?ssl=true&replicaSet=atlas-jjdnxo-shard-0&authSource=admin&retryWrites=true&w"
+                        + "=majority\"");
 
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
