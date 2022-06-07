@@ -302,11 +302,13 @@ public class Queries {
         return 0;
     }
 
-    static String[] getAllSessionHandlesForUser(Start start, String userId) {
+    static String[] getAllNonExpiredSessionHandlesForUser(Start start, String userId) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
         List<String> temp = new ArrayList<>();
-        try (MongoCursor cursor = collection.find(Filters.eq("user_id", userId)).iterator()) {
+        try (MongoCursor cursor = collection
+                .find(Filters.and(Filters.eq("user_id", userId), Filters.gte("expires_at", System.currentTimeMillis())))
+                .iterator()) {
             while (cursor.hasNext()) {
                 Document currDoc = (Document) cursor.next();
                 temp.add(currDoc.getString("_id"));

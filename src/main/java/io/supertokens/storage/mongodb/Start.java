@@ -101,9 +101,9 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public String[] getAllSessionHandlesForUser(String userId) throws StorageQueryException {
+    public String[] getAllNonExpiredSessionHandlesForUser(String userId) throws StorageQueryException {
         try {
-            return Queries.getAllSessionHandlesForUser(this, userId);
+            return Queries.getAllNonExpiredSessionHandlesForUser(this, userId);
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }
