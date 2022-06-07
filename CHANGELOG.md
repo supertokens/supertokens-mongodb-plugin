@@ -7,7 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.15.0] - 2022-06-07
+
+- Compatibility with plugin interface 2.15 - returns only non expired session handles for a user
+
 ## [1.14.0] - 2022-05-05
+
 - New plugin version (v2.14)
 
 ## [1.13.0] - 2022-03-17
