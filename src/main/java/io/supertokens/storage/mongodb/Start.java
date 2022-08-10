@@ -343,6 +343,17 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
+    public boolean isUserIdBeingUsedInNonAuthRecipe(String className, String userId) throws StorageQueryException {
+        /* We do not do anything here since Mongodb does not support UserIdMapping */
+        return false;
+    }
+
+    @Override
+    public void addInfoToNonAuthRecipesBasedOnUserId(String className, String userId) throws StorageQueryException {
+        /* We do not do anything here since Mongodb does not support UserIdMapping */
+    }
+
+    @Override
     public List<JWTSigningKeyInfo> getJWTSigningKeys_Transaction() throws StorageQueryException {
         try {
             return JWTSigningQueries.getJWTSigningKeys_Transaction(this);
