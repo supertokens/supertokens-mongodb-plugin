@@ -138,7 +138,7 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
         if (Thread.currentThread() != start.mainThread) {
             throw new QuitProgramFromPluginException("Should not come here");
         }
-        Logging.info(start, "Setting up MongoDB connection.");
+        Logging.info(start, "Setting up MongoDB connection.", true);
         boolean longMessagePrinted = false;
         long maxTryTime = System.currentTimeMillis() + getTimeToWaitToInit(start);
         String errorMessage = "Error connecting to MongoDB instance. Please make sure that MongoDB is running and that "
@@ -157,12 +157,13 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
                         }
                         if (!longMessagePrinted) {
                             longMessagePrinted = true;
-                            Logging.info(start, errorMessage);
+                            Logging.info(start, errorMessage, true);
                         }
                         double minsRemaining = (maxTryTime - System.currentTimeMillis()) / (1000.0 * 60);
                         NumberFormat formatter = new DecimalFormat("#0.0");
                         Logging.info(start,
-                                "Trying again in a few seconds for " + formatter.format(minsRemaining) + " mins...");
+                                "Trying again in a few seconds for " + formatter.format(minsRemaining) + " mins...",
+                                true);
                         try {
                             if (Thread.interrupted()) {
                                 throw new InterruptedException();
