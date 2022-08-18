@@ -19,6 +19,7 @@ package io.supertokens.storage.mongodb.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.supertokens.pluginInterface.LOG_LEVEL;
 import io.supertokens.pluginInterface.exceptions.QuitProgramFromPluginException;
 import io.supertokens.storage.mongodb.ResourceDistributor;
 import io.supertokens.storage.mongodb.Start;
@@ -26,15 +27,18 @@ import io.supertokens.storage.mongodb.output.Logging;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 public class Config extends ResourceDistributor.SingletonResource {
 
     private static final String RESOURCE_KEY = "io.supertokens.storage.mongodb.config.Config";
     private final MongoDBConfig config;
     private final Start start;
+    private final Set<LOG_LEVEL> logLevels;
 
-    private Config(Start start, String configFilePath) {
+    private Config(Start start, String configFilePath, Set<LOG_LEVEL> logLevels) {
         this.start = start;
+        this.logLevels = logLevels;
         try {
             config = loadMongoDBConfig(configFilePath);
         } catch (IOException e) {
@@ -46,12 +50,16 @@ public class Config extends ResourceDistributor.SingletonResource {
         return (Config) start.getResourceDistributor().getResource(RESOURCE_KEY);
     }
 
-    public static void loadConfig(Start start, String configFilePath) {
+    public static void loadConfig(Start start, String configFilePath, Set<LOG_LEVEL> logLevels) {
         if (getInstance(start) != null) {
             return;
         }
-        Logging.info(start, "Loading MongoDB config.");
-        start.getResourceDistributor().setResource(RESOURCE_KEY, new Config(start, configFilePath));
+        start.getResourceDistributor().setResource(RESOURCE_KEY, new Config(start, configFilePath, logLevels));
+        Logging.info(start, "Loading MongoDB config.", true);
+    }
+
+    public static Set<LOG_LEVEL> getLogLevels(Start start) {
+        return getInstance(start).logLevels;
     }
 
     public static MongoDBConfig getConfig(Start start) {

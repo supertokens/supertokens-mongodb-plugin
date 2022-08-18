@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.mongodb.MongoException;
 import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
+import io.supertokens.pluginInterface.LOG_LEVEL;
 import io.supertokens.pluginInterface.STORAGE_TYPE;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
 import io.supertokens.pluginInterface.jwt.JWTSigningKeyInfo;
@@ -36,6 +37,7 @@ import io.supertokens.storage.mongodb.queries.JWTSigningQueries;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
@@ -234,8 +236,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void loadConfig(String configFilePath) {
-        Config.loadConfig(this, configFilePath);
+    public void loadConfig(String configFilePath, Set<LOG_LEVEL> logLevels) {
+        Config.loadConfig(this, configFilePath, logLevels);
     }
 
     @Override

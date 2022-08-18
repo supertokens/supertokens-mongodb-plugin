@@ -62,7 +62,7 @@ public class LoggingTest {
         File errorLog = new File(Config.getConfig(process.getProcess()).getErrorLogPath(process.getProcess()));
 
         Logging.error((Start) StorageLayer.getStorage(process.getProcess()), "From Test", false);
-        Logging.info((Start) StorageLayer.getStorage(process.getProcess()), "From Info");
+        Logging.info((Start) StorageLayer.getStorage(process.getProcess()), "From Info", true);
 
         boolean infoFlag = false;
         boolean errorFlag = false;
@@ -105,7 +105,7 @@ public class LoggingTest {
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
             Logging.error((Start) StorageLayer.getStorage(process.getProcess()), "From Test", false);
-            Logging.info((Start) StorageLayer.getStorage(process.getProcess()), "From Info");
+            Logging.info((Start) StorageLayer.getStorage(process.getProcess()), "From Info", true);
 
             boolean infoFlag = false;
             boolean errorFlag = false;
@@ -173,6 +173,7 @@ public class LoggingTest {
         ByteArrayOutputStream stdOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
 
+        Utils.setValueInConfig("log_level", "DEBUG");
         Utils.setValueInConfig("info_log_path", "\"null\"");
         Utils.setValueInConfig("error_log_path", "\"null\"");
 
@@ -187,10 +188,10 @@ public class LoggingTest {
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
             Logging.debug((Start) StorageLayer.getStorage(process.getProcess()), "outTest-adsvdavasdvas");
-            Logging.error((Start) StorageLayer.getStorage(process.getProcess()), "errTest-dsavivilja", false);
+            Logging.error((Start) StorageLayer.getStorage(process.getProcess()), "errTest-dsavivilja", true);
 
             assertTrue(fileContainsString(stdOutput, "outTest-adsvdavasdvas"));
-            assertTrue(fileContainsString(stdOutput, "errTest-dsavivilja"));
+            assertTrue(fileContainsString(errorOutput, "errTest-dsavivilja"));
 
         } finally {
 
@@ -208,6 +209,7 @@ public class LoggingTest {
         ByteArrayOutputStream stdOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
 
+        Utils.setValueInConfig("log_level", "DEBUG");
         Utils.setValueInConfig("info_log_path", "null");
         Utils.setValueInConfig("error_log_path", "null");
 
@@ -222,10 +224,10 @@ public class LoggingTest {
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
             Logging.debug((Start) StorageLayer.getStorage(process.getProcess()), "outTest-adsvdavasdvas");
-            Logging.error((Start) StorageLayer.getStorage(process.getProcess()), "errTest-dsavivilja", false);
+            Logging.error((Start) StorageLayer.getStorage(process.getProcess()), "errTest-dsavivilja", true);
 
             assertTrue(fileContainsString(stdOutput, "outTest-adsvdavasdvas"));
-            assertTrue(fileContainsString(stdOutput, "errTest-dsavivilja"));
+            assertTrue(fileContainsString(errorOutput, "errTest-dsavivilja"));
 
         } finally {
 
