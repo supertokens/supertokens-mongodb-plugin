@@ -20,7 +20,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     db.session_info.update({},
       {
         "$set": {
-          "useStaticKey": true
+          "use_static_key": true
         }
       });
     ```
@@ -73,7 +73,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     db.session_info.update({},
       {
         "$set": {
-          "useStaticKey": false
+          "use_static_key": false
         }
       });
     ```

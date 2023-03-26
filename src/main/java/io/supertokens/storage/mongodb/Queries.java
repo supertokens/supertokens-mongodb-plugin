@@ -217,7 +217,6 @@ public class Queries {
 
             return result.getModifiedCount() == 1;
         } else {
-
             try {
                 collection.insertOne(new Document("_id", key).append("keys", keyList));
 
