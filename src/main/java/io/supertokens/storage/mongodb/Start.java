@@ -151,11 +151,11 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public void createNewSession(String sessionHandle, String userId, String refreshTokenHash2,
-            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime)
+            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime, boolean useStaticKey)
             throws StorageQueryException {
         try {
             Queries.createNewSession(this, sessionHandle, userId, refreshTokenHash2, userDataInDatabase, expiry,
-                    userDataInJWT, createdAtTime);
+                    userDataInJWT, createdAtTime, useStaticKey);
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }

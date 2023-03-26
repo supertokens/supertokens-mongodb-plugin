@@ -235,14 +235,15 @@ public class Queries {
 
     @SuppressWarnings("unchecked")
     static void createNewSession(Start start, String sessionHandle, String userId, String refreshTokenHash2,
-            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime) {
+            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime, boolean useStaticKey) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
         collection.insertOne(new Document("_id", sessionHandle).append("user_id", userId)
                 .append("refresh_token_hash_2", refreshTokenHash2).append("session_data", userDataInDatabase.toString())
                 .append("expires_at", expiry).append("jwt_user_payload", userDataInJWT.toString())
-                .append("created_at_time", createdAtTime).append("last_updated_sign", Utils.getUUID()));
+                .append("created_at_time", createdAtTime).append("last_updated_sign", Utils.getUUID())
+                .append("use_static_key", useStaticKey));
     }
 
     static SessionInfoWithLastUpdated getSessionInfo_Transaction(Start start, String sessionHandle)
@@ -381,7 +382,7 @@ public class Queries {
                     result.getString("refresh_token_hash_2"),
                     jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
                     jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
-                    result.getLong("created_at_time"));
+                    result.getLong("created_at_time"), result.getBoolean("use_static_key"));
         }
     }
 
@@ -419,7 +420,7 @@ public class Queries {
                     result.getString("refresh_token_hash_2"),
                     jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
                     jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(), result.getLong("created_at_time"),
-                    result.getString("last_updated_sign"));
+                    result.getBoolean("use_static_key"), result.getString("last_updated_sign"));
         }
     }
 

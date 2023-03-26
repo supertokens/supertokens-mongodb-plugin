@@ -7,6 +7,77 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.21.0] - XXX
+
+- Adds support for plugin inteface version 2.21
+- Adds `use_static_key` into `session_info`
+
+### Migration
+
+
+- If using `access_token_signing_key_dynamic` false:
+  - ```
+    db.session_info.update({},
+      {
+        "$set": {
+          "useStaticKey": true
+        }
+      });
+    ```
+  - ```
+    db.key_value.aggregate([
+      {
+        "$match": {
+          _id: "access_token_signing_key_list"
+        }
+      },
+      {
+        $unwind: "$keys"
+      },
+      {
+        $addFields: {
+          _id: {
+            "$concat": [
+              "s-",
+              {
+                $convert: {
+                  input: "$keys.created_at_time",
+                  to: "string"
+                }
+              }
+            ]
+          },
+          "key_string": "$keys.value",
+          "algorithm": "RS256",
+          "created_at": "$keys.created_at_time",
+          
+        }
+      },
+      {
+        "$project": {
+          "keys": 0,
+          
+        }
+      },
+      {
+        "$merge": {
+          "into": "jwt_signing_keys",
+          
+        }
+      }
+    ]);
+    ```
+
+- If using `access_token_signing_key_dynamic` true:
+  - ```
+    db.session_info.update({},
+      {
+        "$set": {
+          "useStaticKey": false
+        }
+      });
+    ```
+
 ## [1.20.0] - 2022-08-10
 
 - New plugin version (v2.20)
