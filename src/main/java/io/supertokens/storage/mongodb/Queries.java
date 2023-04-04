@@ -219,10 +219,14 @@ public class Queries {
         } else {
 
             try {
-                collection.insertOne(new Document("_id", key).append("keys", keyList));
+                UpdateResult result = collection.updateOne(
+                        Filters.and(Filters.eq("_id", key), Filters.size("keys", 0)),
+                        // We have to use a pushEach with here, because it allows us to set where we push the value
+                        Updates.pushEach("keys", keyList, new PushOptions().position(0)),
+                        new UpdateOptions().upsert(true));
 
                 // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
-                return true;
+                return result.getModifiedCount() == 1;
             } catch (MongoException e) {
                 if (!isDuplicateKeyException(e)) {
                     throw e;

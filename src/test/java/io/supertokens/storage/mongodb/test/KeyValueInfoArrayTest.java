@@ -31,8 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class KeyValueInfoArrayTest {
     @Rule
@@ -153,4 +152,28 @@ public class KeyValueInfoArrayTest {
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
     }
 
+    @Test
+    public void checkThatAddWorksWorksWithEmptyList() throws InterruptedException, StorageQueryException {
+        String[] args = { "../" };
+        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+
+        SessionStorage sessionStorage = StorageLayer.getSessionStorage(process.getProcess());
+        if (sessionStorage.getType() != STORAGE_TYPE.NOSQL_1) {
+            return;
+        }
+        SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
+
+        noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
+
+        noSQLSessionStorage_1.removeAccessTokenSigningKeysBefore(199);
+
+        assert noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), null);
+
+        KeyValueInfo[] allKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
+        assertEquals(allKeys.length, 1);
+
+        process.kill();
+        assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+    }
 }
