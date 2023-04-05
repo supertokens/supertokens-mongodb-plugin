@@ -7,7 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [1.21.0] - XXX
+## [1.23.0] - 2023-04-05
 
 - Adds support for plugin inteface version 2.21
 - Adds `use_static_key` into `session_info`
@@ -77,6 +77,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         }
       });
     ```
+- Fixed an issue when adding new access token signing key to an empty list
+
+## [1.22.0] - 2023-03-30
+
+- New plugin version (v2.22)
+
+## [1.21.0] - 2022-08-10
+
+- New plugin version (v2.21)
 
 ## [1.20.0] - 2022-08-10
 
