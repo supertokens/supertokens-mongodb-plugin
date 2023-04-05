@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Fixed an issue when adding new access token signing key to an empty list
+
 ## [1.22.0] - 2023-03-30
 
 - New plugin version (v2.22)
