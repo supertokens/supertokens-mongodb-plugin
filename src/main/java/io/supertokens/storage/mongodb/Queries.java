@@ -382,7 +382,7 @@ public class Queries {
                     jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
                     jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
                     result.getLong("created_at_time"),
-                    result.getBoolean("use_static_key").equals(Boolean.TRUE));
+                    Boolean.TRUE.equals(result.getBoolean("use_static_key")));
         }
     }
 
@@ -420,7 +420,7 @@ public class Queries {
                     result.getString("refresh_token_hash_2"),
                     jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
                     jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(), result.getLong("created_at_time"),
-                    result.getBoolean("use_static_key").equals(Boolean.TRUE),
+                    Boolean.TRUE.equals(result.getBoolean("use_static_key")),
                     result.getString("last_updated_sign"));
         }
     }
