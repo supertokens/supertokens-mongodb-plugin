@@ -9,7 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.23.0] - 2023-04-05
 
-- Adds support for plugin inteface version 2.21
+- Adds support for plugin inteface version 2.23
 - Adds `use_static_key` into `session_info`
 
 ### Migration
