@@ -217,12 +217,15 @@ public class Queries {
 
             return result.getModifiedCount() == 1;
         } else {
-
             try {
-                collection.insertOne(new Document("_id", key).append("keys", keyList));
+                UpdateResult result = collection.updateOne(
+                        Filters.and(Filters.eq("_id", key), Filters.size("keys", 0)),
+                        // We have to use a pushEach with here, because it allows us to set where we push the value
+                        Updates.pushEach("keys", keyList, new PushOptions().position(0)),
+                        new UpdateOptions().upsert(true));
 
                 // TODO: supposed to call this only if result.wasAcknowledged() is true. Why?
-                return true;
+                return result.getModifiedCount() == 1;
             } catch (MongoException e) {
                 if (!isDuplicateKeyException(e)) {
                     throw e;
@@ -235,14 +238,15 @@ public class Queries {
 
     @SuppressWarnings("unchecked")
     static void createNewSession(Start start, String sessionHandle, String userId, String refreshTokenHash2,
-            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime) {
+            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime, boolean useStaticKey) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
         collection.insertOne(new Document("_id", sessionHandle).append("user_id", userId)
                 .append("refresh_token_hash_2", refreshTokenHash2).append("session_data", userDataInDatabase.toString())
                 .append("expires_at", expiry).append("jwt_user_payload", userDataInJWT.toString())
-                .append("created_at_time", createdAtTime).append("last_updated_sign", Utils.getUUID()));
+                .append("created_at_time", createdAtTime).append("last_updated_sign", Utils.getUUID())
+                .append("use_static_key", useStaticKey));
     }
 
     static SessionInfoWithLastUpdated getSessionInfo_Transaction(Start start, String sessionHandle)
@@ -381,7 +385,8 @@ public class Queries {
                     result.getString("refresh_token_hash_2"),
                     jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
                     jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
-                    result.getLong("created_at_time"));
+                    result.getLong("created_at_time"),
+                    Boolean.TRUE.equals(result.getBoolean("use_static_key")));
         }
     }
 
@@ -419,6 +424,7 @@ public class Queries {
                     result.getString("refresh_token_hash_2"),
                     jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
                     jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(), result.getLong("created_at_time"),
+                    Boolean.TRUE.equals(result.getBoolean("use_static_key")),
                     result.getString("last_updated_sign"));
         }
     }
