@@ -68,7 +68,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     ]);
     ```
 
-- If using `access_token_signing_key_dynamic` true:
+- If using `access_token_signing_key_dynamic` true or not set:
   - ```
     db.session_info.update({},
       {
