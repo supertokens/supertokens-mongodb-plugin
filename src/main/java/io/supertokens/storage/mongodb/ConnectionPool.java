@@ -22,7 +22,7 @@ import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import io.supertokens.pluginInterface.exceptions.QuitProgramFromPluginException;
+import io.supertokens.pluginInterface.exceptions.DbInitException;
 import io.supertokens.storage.mongodb.config.Config;
 import io.supertokens.storage.mongodb.config.MongoDBConfig;
 import io.supertokens.storage.mongodb.output.Logging;
@@ -35,9 +35,19 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionPool extends ResourceDistributor.SingletonResource {
 
     private static final String RESOURCE_KEY = "io.supertokens.storage.mongodb.ConnectionPool";
-    private final MongoClient mongoClient;
+    private MongoClient mongoClient;
+
+    private final Start start;
 
     private ConnectionPool(Start start) {
+        this.start = start;
+    }
+
+    private synchronized void initialiseMongoClient() {
+        if (this.mongoClient != null) {
+            return;
+        }
+
         if (!start.enabled) {
             throw new MongoTimeoutException("Connection refused");
         }
@@ -131,12 +141,16 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
         return (ConnectionPool) start.getResourceDistributor().getResource(RESOURCE_KEY);
     }
 
-    static void initPool(Start start) {
-        if (getInstance(start) != null) {
+    static boolean isAlreadyInitialised(Start start) {
+        return getInstance(start) != null && getInstance(start).mongoClient != null;
+    }
+
+    static void initPool(Start start) throws DbInitException {
+        if (isAlreadyInitialised(start)) {
             return;
         }
         if (Thread.currentThread() != start.mainThread) {
-            throw new QuitProgramFromPluginException("Should not come here");
+            throw new DbInitException("Should not come here");
         }
         Logging.info(start, "Setting up MongoDB connection.", true);
         boolean longMessagePrinted = false;
@@ -144,16 +158,18 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
         String errorMessage = "Error connecting to MongoDB instance. Please make sure that MongoDB is running and that "
                 + "you have" + " specified the correct value for 'mongodb_connection_uri' in your " + "config file";
         try {
+            ConnectionPool con = new ConnectionPool(start);
+            start.getResourceDistributor().setResource(RESOURCE_KEY, con);
             while (true) {
                 try {
-                    start.getResourceDistributor().setResource(RESOURCE_KEY, new ConnectionPool(start));
+                    con.initialiseMongoClient();
                     break;
                 } catch (Exception e) {
                     if (e.getMessage().contains("Connection refused") || (e instanceof com.mongodb.MongoTimeoutException
                             && e.getMessage().contains("Prematurely reached end of stream"))) {
                         start.handleKillSignalForWhenItHappens();
                         if (System.currentTimeMillis() > maxTryTime) {
-                            throw new QuitProgramFromPluginException(errorMessage);
+                            throw new DbInitException(errorMessage);
                         }
                         if (!longMessagePrinted) {
                             longMessagePrinted = true;
@@ -170,7 +186,7 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
                             }
                             Thread.sleep(getRetryIntervalIfInitFails(start));
                         } catch (InterruptedException ex) {
-                            throw new QuitProgramFromPluginException(errorMessage);
+                            throw new DbInitException(errorMessage);
                         }
                     } else {
                         throw e;
@@ -184,7 +200,7 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
 
     public static MongoDatabase getClientConnectedToDatabase(Start start) {
         if (getInstance(start) == null) {
-            throw new QuitProgramFromPluginException("Please call initPool before getConnection");
+            throw new RuntimeException("Please call initPool before getConnection");
         }
         if (!start.enabled) {
             throw new MongoException("Storage layer disabled");

@@ -19,13 +19,14 @@ package io.supertokens.storage.mongodb.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.gson.JsonObject;
 import io.supertokens.pluginInterface.LOG_LEVEL;
-import io.supertokens.pluginInterface.exceptions.QuitProgramFromPluginException;
+import io.supertokens.pluginInterface.exceptions.InvalidConfigException;
+import io.supertokens.pluginInterface.multitenancy.TenantIdentifier;
 import io.supertokens.storage.mongodb.ResourceDistributor;
 import io.supertokens.storage.mongodb.Start;
 import io.supertokens.storage.mongodb.output.Logging;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
@@ -34,15 +35,15 @@ public class Config extends ResourceDistributor.SingletonResource {
     private static final String RESOURCE_KEY = "io.supertokens.storage.mongodb.config.Config";
     private final MongoDBConfig config;
     private final Start start;
-    private final Set<LOG_LEVEL> logLevels;
+    private Set<LOG_LEVEL> logLevels;
 
-    private Config(Start start, String configFilePath, Set<LOG_LEVEL> logLevels) {
+    private Config(Start start, JsonObject configJson, Set<LOG_LEVEL> logLevels) throws InvalidConfigException {
         this.start = start;
         this.logLevels = logLevels;
         try {
-            config = loadMongoDBConfig(configFilePath);
+            config = loadMongoDBConfig(configJson);
         } catch (IOException e) {
-            throw new QuitProgramFromPluginException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -50,11 +51,12 @@ public class Config extends ResourceDistributor.SingletonResource {
         return (Config) start.getResourceDistributor().getResource(RESOURCE_KEY);
     }
 
-    public static void loadConfig(Start start, String configFilePath, Set<LOG_LEVEL> logLevels) {
+    public static void loadConfig(Start start, JsonObject configJson, Set<LOG_LEVEL> logLevels, TenantIdentifier tenantIdentifier) throws
+            InvalidConfigException {
         if (getInstance(start) != null) {
             return;
         }
-        start.getResourceDistributor().setResource(RESOURCE_KEY, new Config(start, configFilePath, logLevels));
+        start.getResourceDistributor().setResource(RESOURCE_KEY, new Config(start, configJson, logLevels));
         Logging.info(start, "Loading MongoDB config.", true);
     }
 
@@ -64,22 +66,27 @@ public class Config extends ResourceDistributor.SingletonResource {
 
     public static MongoDBConfig getConfig(Start start) {
         if (getInstance(start) == null) {
-            throw new QuitProgramFromPluginException("Please call loadConfig() before calling getConfig()");
+            throw new RuntimeException("Please call loadConfig() before calling getConfig()");
         }
         return getInstance(start).config;
     }
 
-    private MongoDBConfig loadMongoDBConfig(String configFilePath) throws IOException {
+    public static void setLogLevels(Start start, Set<LOG_LEVEL> logLevels) {
+        getInstance(start).logLevels = logLevels;
+    }
+
+    private MongoDBConfig loadMongoDBConfig(JsonObject configJson) throws IOException, InvalidConfigException {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        MongoDBConfig config = mapper.readValue(new File(configFilePath), MongoDBConfig.class);
+        MongoDBConfig config = mapper.readValue(configJson.toString(), MongoDBConfig.class);
+
         config.validateAndInitialise();
         return config;
     }
 
-    public static boolean canBeUsed(String configFilePath) {
+    public static boolean canBeUsed(JsonObject configJson) {
         try {
             final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            MongoDBConfig config = mapper.readValue(new File(configFilePath), MongoDBConfig.class);
+            MongoDBConfig config = mapper.readValue(configJson.toString(), MongoDBConfig.class);
             return config.getConnectionURI() != null;
         } catch (Exception e) {
             return false;

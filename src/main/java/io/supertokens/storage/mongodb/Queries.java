@@ -139,10 +139,11 @@ public class Queries {
         }
     }
 
-    static void deleteSessionsOfUser(Start start, String userId) {
+    static boolean deleteSessionsOfUser(Start start, String userId) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
-        collection.deleteMany(Filters.eq("user_id", userId));
+        DeleteResult result = collection.deleteMany(Filters.eq("user_id", userId));
+        return result.getDeletedCount() > 0;
     }
 
     static KeyValueInfo getKeyValue(Start start, String key) throws StorageQueryException {

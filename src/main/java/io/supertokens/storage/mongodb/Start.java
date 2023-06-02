@@ -20,18 +20,20 @@ package io.supertokens.storage.mongodb;
 import ch.qos.logback.classic.Logger;
 import com.google.gson.JsonObject;
 import com.mongodb.MongoException;
-import io.supertokens.pluginInterface.KeyValueInfo;
-import io.supertokens.pluginInterface.KeyValueInfoWithLastUpdated;
-import io.supertokens.pluginInterface.LOG_LEVEL;
-import io.supertokens.pluginInterface.STORAGE_TYPE;
+import io.supertokens.pluginInterface.*;
+import io.supertokens.pluginInterface.exceptions.DbInitException;
+import io.supertokens.pluginInterface.exceptions.InvalidConfigException;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
 import io.supertokens.pluginInterface.jwt.JWTSigningKeyInfo;
 import io.supertokens.pluginInterface.jwt.exceptions.DuplicateKeyIdException;
 import io.supertokens.pluginInterface.jwt.nosqlstorage.JWTRecipeNoSQLStorage_1;
+import io.supertokens.pluginInterface.multitenancy.AppIdentifier;
+import io.supertokens.pluginInterface.multitenancy.TenantIdentifier;
 import io.supertokens.pluginInterface.session.SessionInfo;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionInfoWithLastUpdated;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionNoSQLStorage_1;
 import io.supertokens.storage.mongodb.config.Config;
+import io.supertokens.storage.mongodb.config.MongoDBConfig;
 import io.supertokens.storage.mongodb.output.Logging;
 import io.supertokens.storage.mongodb.queries.JWTSigningQueries;
 import org.slf4j.LoggerFactory;
@@ -75,7 +77,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public SessionInfo getSession(String sessionHandle) throws StorageQueryException {
+    public SessionInfo getSession(TenantIdentifier tenantIdentifier, String sessionHandle) throws StorageQueryException {
         try {
             return Queries.getSession(this, sessionHandle);
         } catch (MongoException e) {
@@ -84,7 +86,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public int updateSession(String sessionHandle, JsonObject sessionData, JsonObject jwtPayload)
+    public int updateSession(TenantIdentifier tenantIdentifier, String sessionHandle, JsonObject sessionData, JsonObject jwtPayload)
             throws StorageQueryException {
         try {
             return Queries.updateSession(this, sessionHandle, sessionData, jwtPayload);
@@ -103,7 +105,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public String[] getAllNonExpiredSessionHandlesForUser(String userId) throws StorageQueryException {
+    public String[] getAllNonExpiredSessionHandlesForUser(TenantIdentifier tenantIdentifier, String userId) throws StorageQueryException {
         try {
             return Queries.getAllNonExpiredSessionHandlesForUser(this, userId);
         } catch (MongoException e) {
@@ -112,7 +114,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public int deleteSession(String[] sessionHandles) throws StorageQueryException {
+    public int deleteSession(TenantIdentifier tenantIdentifier, String[] sessionHandles) throws StorageQueryException {
         try {
             return Queries.deleteSession(this, sessionHandles);
         } catch (MongoException e) {
@@ -121,7 +123,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public int getNumberOfSessions() throws StorageQueryException {
+    public int getNumberOfSessions(TenantIdentifier tenantIdentifier) throws StorageQueryException {
         try {
             return Queries.getNumberOfSessions(this);
         } catch (MongoException e) {
@@ -150,7 +152,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void createNewSession(String sessionHandle, String userId, String refreshTokenHash2,
+    public void createNewSession(TenantIdentifier tenantIdentifier, String sessionHandle, String userId, String refreshTokenHash2,
             JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime, boolean useStaticKey)
             throws StorageQueryException {
         try {
@@ -162,7 +164,12 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void deleteSessionsOfUser(String userId) throws StorageQueryException {
+    public boolean deleteSessionsOfUser(TenantIdentifier tenantIdentifier, String userId) throws StorageQueryException {
+        return Queries.deleteSessionsOfUser(this, userId);
+    }
+
+    @Override
+    public void deleteSessionsOfUser(AppIdentifier appIdentifier, String userId) throws StorageQueryException {
         Queries.deleteSessionsOfUser(this, userId);
     }
 
@@ -208,7 +215,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void removeAccessTokenSigningKeysBefore(long time) throws StorageQueryException {
+    public void removeAccessTokenSigningKeysBefore(AppIdentifier appIdentifier, long time) throws StorageQueryException {
         try {
             Queries.removeArrayKeyValuesBefore(this, ACCESS_TOKEN_SIGNING_KEY_LIST_NAME, time);
         } catch (MongoException e) {
@@ -236,8 +243,9 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void loadConfig(String configFilePath, Set<LOG_LEVEL> logLevels) {
-        Config.loadConfig(this, configFilePath, logLevels);
+    public void loadConfig(JsonObject configJson, Set<LOG_LEVEL> logLevels, TenantIdentifier tenantIdentifier) throws
+            InvalidConfigException {
+        Config.loadConfig(this, configJson, logLevels, tenantIdentifier);
     }
 
     @Override
@@ -279,12 +287,12 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void initStorage() {
+    public void initStorage(boolean shouldWait) throws DbInitException {
         ConnectionPool.initPool(this);
     }
 
     @Override
-    public void setKeyValue(String key, KeyValueInfo info) throws StorageQueryException {
+    public void setKeyValue(TenantIdentifier tenantIdentifier, String key, KeyValueInfo info) throws StorageQueryException {
         try {
             Queries.setKeyValue(this, key, info);
         } catch (MongoException e) {
@@ -293,7 +301,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public KeyValueInfo getKeyValue(String key) throws StorageQueryException {
+    public KeyValueInfo getKeyValue(TenantIdentifier tenantIdentifier, String key) throws StorageQueryException {
         try {
             return Queries.getKeyValue(this, key);
         } catch (MongoException e) {
@@ -340,19 +348,18 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public boolean canBeUsed(String configFilePath) {
-        return Config.canBeUsed(configFilePath);
+    public boolean canBeUsed(JsonObject configJson) {
+        return Config.canBeUsed(configJson);
     }
 
     @Override
-    public boolean isUserIdBeingUsedInNonAuthRecipe(String className, String userId) throws StorageQueryException {
-        /* We do not do anything here since Mongodb does not support UserIdMapping */
-        return false;
+    public boolean isUserIdBeingUsedInNonAuthRecipe(AppIdentifier appIdentifier, String className, String userId) throws StorageQueryException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void addInfoToNonAuthRecipesBasedOnUserId(String className, String userId) throws StorageQueryException {
-        /* We do not do anything here since Mongodb does not support UserIdMapping */
+    public void addInfoToNonAuthRecipesBasedOnUserId(TenantIdentifier tenantIdentifier, String className, String userId) throws StorageQueryException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -379,5 +386,42 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
             throw new StorageQueryException(e);
         }
+    }
+
+    @Override
+    public String getUserPoolId() {
+        // we do not allow multiple mongo dbs as there is no multitenancy support with this plugin
+        return "same-user-pool";
+    }
+
+    @Override
+    public String getConnectionPoolId() {
+        // we do not allow multiple mongo dbs as there is no multitenancy support with this plugin
+        return "same-connection-pool";
+    }
+
+    @Override
+    public void assertThatConfigFromSameUserPoolIsNotConflicting(JsonObject otherConfig) throws InvalidConfigException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void modifyConfigToAddANewUserPoolForTesting(JsonObject config, int poolNumber) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String[] getProtectedConfigsFromSuperTokensSaaSUsers() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<String> getValidFieldsInConfig() {
+        return MongoDBConfig.getValidFields();
+    }
+
+    @Override
+    public void setLogLevels(Set<LOG_LEVEL> logLevels) {
+        Config.setLogLevels(this, logLevels);
     }
 }
