@@ -156,7 +156,7 @@ public class ConfigTest {
         ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
         assertNotNull(e);
         TestCase.assertEquals(e.exception.getMessage(),
-                "java.io.FileNotFoundException: ../config.yaml (No such file or directory)");
+                "../config.yaml (No such file or directory)");
 
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
@@ -207,7 +207,7 @@ public class ConfigTest {
 
         ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE, 7000);
         assertNotNull(e);
-        assertEquals(e.exception.getMessage(),
+        assertEquals(e.exception.getCause().getMessage(),
                 "Error connecting to MongoDB instance. Please make sure that MongoDB is running and that you have "
                         + "specified the correct value for 'mongodb_connection_uri' in your config file");
 
@@ -379,12 +379,11 @@ public class ConfigTest {
             assertEquals(
                     "The provided mongodb connection URI has an incorrect format. Please use a format like "
                             + "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...",
-                    e.exception.getMessage());
+                    e.exception.getCause().getMessage());
 
             process.kill();
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
         }
-
     }
 
     @Test

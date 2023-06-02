@@ -21,6 +21,7 @@ import io.supertokens.ProcessState;
 import io.supertokens.pluginInterface.KeyValueInfo;
 import io.supertokens.pluginInterface.STORAGE_TYPE;
 import io.supertokens.pluginInterface.exceptions.StorageQueryException;
+import io.supertokens.pluginInterface.multitenancy.AppIdentifier;
 import io.supertokens.pluginInterface.session.SessionStorage;
 import io.supertokens.pluginInterface.session.noSqlStorage.SessionNoSQLStorage_1;
 import io.supertokens.storageLayer.StorageLayer;
@@ -53,7 +54,7 @@ public class KeyValueInfoArrayTest {
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-        SessionStorage sessionStorage = StorageLayer.getSessionStorage(process.getProcess());
+        SessionStorage sessionStorage = ((SessionStorage) StorageLayer.getStorage(process.getProcess()));
         if (sessionStorage.getType() != STORAGE_TYPE.NOSQL_1) {
             return;
         }
@@ -77,7 +78,7 @@ public class KeyValueInfoArrayTest {
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-        SessionStorage sessionStorage = StorageLayer.getSessionStorage(process.getProcess());
+        SessionStorage sessionStorage = ((SessionStorage) StorageLayer.getStorage(process.getProcess()));
         if (sessionStorage.getType() != STORAGE_TYPE.NOSQL_1) {
             return;
         }
@@ -100,18 +101,20 @@ public class KeyValueInfoArrayTest {
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-        SessionStorage sessionStorage = StorageLayer.getSessionStorage(process.getProcess());
+        SessionStorage sessionStorage = ((SessionStorage) StorageLayer.getStorage(process.getProcess()));
         if (sessionStorage.getType() != STORAGE_TYPE.NOSQL_1) {
             return;
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
 
-        noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
+        KeyValueInfo[] allKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
+
+        noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), allKeys[0].createdAtTime);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key2", 101), 100L);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L);
 
-        KeyValueInfo[] allKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
-        assertEquals(allKeys.length, 3);
+        allKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
+        assertEquals(allKeys.length, 4);
 
         assertEquals(allKeys[0].value, "key3");
         assertEquals(allKeys[1].value, "key2");
@@ -131,7 +134,7 @@ public class KeyValueInfoArrayTest {
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-        SessionStorage sessionStorage = StorageLayer.getSessionStorage(process.getProcess());
+        SessionStorage sessionStorage = ((SessionStorage) StorageLayer.getStorage(process.getProcess()));
         if (sessionStorage.getType() != STORAGE_TYPE.NOSQL_1) {
             return;
         }
@@ -141,7 +144,7 @@ public class KeyValueInfoArrayTest {
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key2", 101), 100L);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L);
 
-        noSQLSessionStorage_1.removeAccessTokenSigningKeysBefore(199);
+        noSQLSessionStorage_1.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null), 199);
 
         KeyValueInfo[] cleanedKeys = noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction();
         assertEquals(cleanedKeys.length, 1);
@@ -158,7 +161,7 @@ public class KeyValueInfoArrayTest {
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
-        SessionStorage sessionStorage = StorageLayer.getSessionStorage(process.getProcess());
+        SessionStorage sessionStorage = ((SessionStorage) StorageLayer.getStorage(process.getProcess()));
         if (sessionStorage.getType() != STORAGE_TYPE.NOSQL_1) {
             return;
         }
@@ -166,7 +169,7 @@ public class KeyValueInfoArrayTest {
 
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
 
-        noSQLSessionStorage_1.removeAccessTokenSigningKeysBefore(199);
+        noSQLSessionStorage_1.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null), 199);
 
         assert noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), null);
 
