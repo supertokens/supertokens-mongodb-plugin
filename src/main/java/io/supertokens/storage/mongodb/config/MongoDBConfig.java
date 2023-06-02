@@ -19,9 +19,16 @@ package io.supertokens.storage.mongodb.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.supertokens.pluginInterface.exceptions.QuitProgramFromPluginException;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import io.supertokens.pluginInterface.exceptions.DbInitException;
+import io.supertokens.pluginInterface.exceptions.InvalidConfigException;
 
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MongoDBConfig {
@@ -43,6 +50,17 @@ public class MongoDBConfig {
 
     @JsonProperty
     private String mongodb_collection_names_prefix = "";
+
+    public static Set<String> getValidFields() {
+        MongoDBConfig config = new MongoDBConfig();
+        JsonObject configObj = new GsonBuilder().serializeNulls().create().toJsonTree(config).getAsJsonObject();
+
+        Set<String> validFields = new HashSet<>();
+        for (Map.Entry<String, JsonElement> entry : configObj.entrySet()) {
+            validFields.add(entry.getKey());
+        }
+        return validFields;
+    }
 
     public boolean useConnectionURIAsIs() {
         return mongodb_database_name == null && mongodb_connection_uri != null;
@@ -152,10 +170,10 @@ public class MongoDBConfig {
         return tableName;
     }
 
-    void validateAndInitialise() {
+    void validateAndInitialise() throws InvalidConfigException {
 
         if (mongodb_connection_uri == null) {
-            throw new QuitProgramFromPluginException(
+            throw new InvalidConfigException(
                     "'mongodb_connection_uri' is not set in the config.yaml file. Please set this value and restart "
                             + "SuperTokens");
         }
@@ -163,7 +181,7 @@ public class MongoDBConfig {
         try {
             URI ignored = URI.create(mongodb_connection_uri);
         } catch (Exception e) {
-            throw new QuitProgramFromPluginException(
+            throw new InvalidConfigException(
                     "The provided mongodb connection URI has an incorrect format. Please use a format like "
                             + "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...");
         }
