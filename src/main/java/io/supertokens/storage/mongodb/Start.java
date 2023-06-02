@@ -354,13 +354,12 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public boolean isUserIdBeingUsedInNonAuthRecipe(AppIdentifier appIdentifier, String className, String userId) throws StorageQueryException {
-        /* We do not do anything here since Mongodb does not support UserIdMapping */
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void addInfoToNonAuthRecipesBasedOnUserId(TenantIdentifier tenantIdentifier, String className, String userId) throws StorageQueryException {
-        /* We do not do anything here since Mongodb does not support UserIdMapping */
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -391,29 +390,29 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public String getUserPoolId() {
-        // we do not allow multiple in memory dbs as that is not really useful in any way..
+        // we do not allow multiple mongo dbs as there is no multitenancy support with this plugin
         return "same-user-pool";
     }
 
     @Override
     public String getConnectionPoolId() {
-        // we do not allow multiple in memory dbs as that is not really useful in any way..
+        // we do not allow multiple mongo dbs as there is no multitenancy support with this plugin
         return "same-connection-pool";
     }
 
     @Override
     public void assertThatConfigFromSameUserPoolIsNotConflicting(JsonObject otherConfig) throws InvalidConfigException {
-        // there is nothing to check here cause mongo plugin does not support multitenancy
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void modifyConfigToAddANewUserPoolForTesting(JsonObject config, int poolNumber) {
-        // do nothing cause we have only one in mem db.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String[] getProtectedConfigsFromSuperTokensSaaSUsers() {
-        return new String[0];
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -423,6 +422,6 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public void setLogLevels(Set<LOG_LEVEL> logLevels) {
-        // not necessary
+        Config.setLogLevels(this, logLevels);
     }
 }

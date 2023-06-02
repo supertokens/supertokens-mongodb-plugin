@@ -21,14 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.gson.JsonObject;
 import io.supertokens.pluginInterface.LOG_LEVEL;
-import io.supertokens.pluginInterface.exceptions.DbInitException;
 import io.supertokens.pluginInterface.exceptions.InvalidConfigException;
 import io.supertokens.pluginInterface.multitenancy.TenantIdentifier;
 import io.supertokens.storage.mongodb.ResourceDistributor;
 import io.supertokens.storage.mongodb.Start;
 import io.supertokens.storage.mongodb.output.Logging;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
@@ -37,7 +35,7 @@ public class Config extends ResourceDistributor.SingletonResource {
     private static final String RESOURCE_KEY = "io.supertokens.storage.mongodb.config.Config";
     private final MongoDBConfig config;
     private final Start start;
-    private final Set<LOG_LEVEL> logLevels;
+    private Set<LOG_LEVEL> logLevels;
 
     private Config(Start start, JsonObject configJson, Set<LOG_LEVEL> logLevels) throws InvalidConfigException {
         this.start = start;
@@ -71,6 +69,10 @@ public class Config extends ResourceDistributor.SingletonResource {
             throw new RuntimeException("Please call loadConfig() before calling getConfig()");
         }
         return getInstance(start).config;
+    }
+
+    public static void setLogLevels(Start start, Set<LOG_LEVEL> logLevels) {
+        getInstance(start).logLevels = logLevels;
     }
 
     private MongoDBConfig loadMongoDBConfig(JsonObject configJson) throws IOException, InvalidConfigException {

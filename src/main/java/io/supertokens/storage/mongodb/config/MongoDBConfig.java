@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.supertokens.pluginInterface.LOG_LEVEL;
 import io.supertokens.pluginInterface.exceptions.DbInitException;
 import io.supertokens.pluginInterface.exceptions.InvalidConfigException;
 
@@ -186,5 +187,4 @@ public class MongoDBConfig {
                             + "mongodb+srv://[user[:[password]]@]host[:port][/dbname][?attr1=val1&attr2=val2...");
         }
     }
-
 }
