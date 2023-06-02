@@ -7,7 +7,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-- Compatibility with core version 2.22
+## [1.24.0]
+
+- Compatibility with plugin interface 3.0.0
 
 ## [1.23.0] - 2023-04-05
 
