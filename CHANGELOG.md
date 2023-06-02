@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Compatibility with core version 2.22
+
 ## [1.23.0] - 2023-04-05
 
 - Adds support for plugin inteface version 2.23
