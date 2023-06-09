@@ -232,9 +232,10 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void constructor(String processId, boolean silent) {
+    public void constructor(String processId, boolean silent, boolean isTesting) {
         this.processId = processId;
         Start.silent = silent;
+        Start.isTesting = isTesting;
     }
 
     @Override
@@ -424,4 +425,15 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     public void setLogLevels(Set<LOG_LEVEL> logLevels) {
         Config.setLogLevels(this, logLevels);
     }
+
+    @Override
+    public String[] getAllTablesInTheDatabase() throws StorageQueryException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String[] getAllTablesInTheDatabaseThatHasDataForAppId(String appId) throws StorageQueryException {
+        throw new UnsupportedOperationException();
+    }
+
 }
