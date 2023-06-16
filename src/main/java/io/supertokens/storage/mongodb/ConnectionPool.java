@@ -141,6 +141,10 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
         return (ConnectionPool) start.getResourceDistributor().getResource(RESOURCE_KEY);
     }
 
+    private static void removeInstance(Start start) {
+        start.getResourceDistributor().removeResource(RESOURCE_KEY);
+    }
+
     static boolean isAlreadyInitialised(Start start) {
         return getInstance(start) != null && getInstance(start).mongoClient != null;
     }
@@ -213,5 +217,6 @@ public class ConnectionPool extends ResourceDistributor.SingletonResource {
             return;
         }
         getInstance(start).mongoClient.close();
+        removeInstance(start);
     }
 }
