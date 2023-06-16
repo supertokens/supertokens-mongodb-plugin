@@ -61,6 +61,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     public void deleteAllInformation() throws StorageQueryException {
         try {
             initStorage(false);
+            enabled = true;
             Queries.deleteAllCollections(this);
             close();
         } catch (MongoException e) {
