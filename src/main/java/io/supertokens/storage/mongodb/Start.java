@@ -63,7 +63,6 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
             initStorage(false);
             enabled = true;
             Queries.deleteAllCollections(this);
-            close();
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         } catch (DbInitException e) {
