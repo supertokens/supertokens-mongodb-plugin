@@ -383,6 +383,7 @@ public class Queries {
         public SessionInfo map(Document result) throws Exception {
             JsonParser jp = new JsonParser();
             return new SessionInfo(result.getString("_id"), result.getString("user_id"),
+                    result.getString("user_id"),
                     result.getString("refresh_token_hash_2"),
                     jp.parse(result.getString("session_data")).getAsJsonObject(), result.getLong("expires_at"),
                     jp.parse(result.getString("jwt_user_payload")).getAsJsonObject(),
