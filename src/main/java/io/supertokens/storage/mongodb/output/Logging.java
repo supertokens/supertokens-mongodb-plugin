@@ -37,10 +37,10 @@ public class Logging extends ResourceDistributor.SingletonResource {
 
     private Logging(Start start, String infoLogPath, String errorLogPath) {
         this.infoLogger = infoLogPath.equals("null")
-                ? createLoggerForConsole(start, "io.supertokens.storage.mongodb.Info")
+                ? createLoggerForConsole(start, "io.supertokens.storage.mongodb.Info", LOG_LEVEL.INFO)
                 : createLoggerForFile(start, infoLogPath, "io.supertokens.storage.mongodb.Info");
         this.errorLogger = errorLogPath.equals("null")
-                ? createLoggerForConsole(start, "io.supertokens.storage.mongodb.Error")
+                ? createLoggerForConsole(start, "io.supertokens.storage.mongodb.Error", LOG_LEVEL.ERROR)
                 : createLoggerForFile(start, errorLogPath, "io.supertokens.storage.mongodb.Error");
     }
 
@@ -189,12 +189,13 @@ public class Logging extends ResourceDistributor.SingletonResource {
         return logger;
     }
 
-    private Logger createLoggerForConsole(Start start, String name) {
+    private Logger createLoggerForConsole(Start start, String name, LOG_LEVEL logLevel) {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         LayoutWrappingEncoder ple = new LayoutWrappingEncoder(start.getProcessId());
         ple.setContext(lc);
         ple.start();
         ConsoleAppender<ILoggingEvent> logConsoleAppender = new ConsoleAppender<>();
+        logConsoleAppender.setTarget(logLevel == LOG_LEVEL.ERROR ? "System.err" : "System.out");
         logConsoleAppender.setEncoder(ple);
         logConsoleAppender.setContext(lc);
         logConsoleAppender.start();
