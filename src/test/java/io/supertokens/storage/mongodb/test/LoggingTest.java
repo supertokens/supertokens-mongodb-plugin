@@ -20,6 +20,7 @@ package io.supertokens.storage.mongodb.test;
 import io.supertokens.ProcessState;
 import io.supertokens.config.Config;
 import io.supertokens.storage.mongodb.Start;
+import io.supertokens.storage.mongodb.config.MongoDBConfig;
 import io.supertokens.storage.mongodb.output.Logging;
 import io.supertokens.storageLayer.StorageLayer;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -36,6 +37,7 @@ import java.util.Scanner;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class LoggingTest {
     @Rule
@@ -237,6 +239,69 @@ public class LoggingTest {
             System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err)));
         }
 
+    }
+
+    @Test
+    public void testDBPasswordIsNotLoggedWhenProcessStartsEnds() throws Exception {
+        String[] args = { "../" };
+
+        Utils.setValueInConfig("error_log_path", "null");
+        Utils.setValueInConfig("info_log_path", "null");
+
+        ByteArrayOutputStream stdOutput = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
+
+        System.setOut(new PrintStream(stdOutput));
+        System.setErr(new PrintStream(errorOutput));
+
+        try {
+            // Case 1: DB Password shouldn't be logged after starting/stopping the process with correct credentials
+            {
+                TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+
+                process.startProcess();
+                assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
+
+                Start start = (Start) StorageLayer.getStorage(process.getProcess());
+                MongoDBConfig userConfig = io.supertokens.storage.mongodb.config.Config.getConfig(start);
+                String dbPasswordFromConfig = userConfig.getPassword();
+
+                process.kill();
+                assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+
+                assertFalse(fileContainsString(stdOutput, dbPasswordFromConfig));
+                assertFalse(fileContainsString(errorOutput, dbPasswordFromConfig));
+            }
+
+            // Case 2: DB Password shouldn't be logged after starting/stopping the process with incorrect credentials
+            {
+                String dbUser = "db_user";
+                String dbPassword = "db_password";
+                String dbName = "db_does_not_exist";
+                String dbConnectionUri = "mongodb://" + dbUser + ":" + dbPassword + "@localhost:27017/" + dbName;
+
+                Utils.setValueInConfig("mongodb_connection_uri", dbConnectionUri);
+
+                TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+
+                process.startProcess();
+                assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT));
+
+                Start start = (Start) StorageLayer.getStorage(process.getProcess());
+                MongoDBConfig userConfig = io.supertokens.storage.mongodb.config.Config.getConfig(start);
+                String dbPasswordFromConfig = userConfig.getPassword();
+
+                process.kill();
+                assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
+
+                assertFalse(fileContainsString(stdOutput, dbPasswordFromConfig));
+                assertFalse(fileContainsString(errorOutput, dbPasswordFromConfig));
+            }
+
+        } finally {
+            System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
+            System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err)));
+        }
     }
 
     private static boolean fileContainsString(ByteArrayOutputStream log, String value) throws IOException {
