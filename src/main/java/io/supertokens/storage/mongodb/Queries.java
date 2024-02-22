@@ -264,7 +264,7 @@ public class Queries {
     }
 
     static boolean updateSessionInfo_Transaction(Start start, String sessionHandle, String refreshTokenHash2,
-            long expiry, String lastUpdatedSign, boolean useStaticKey) throws StorageQueryException {
+            long expiry, String lastUpdatedSign) throws StorageQueryException {
 
         if (lastUpdatedSign == null) {
             throw new StorageQueryException(new Exception("lastUpdatedSign cannot be null for this update operation"));
@@ -274,7 +274,7 @@ public class Queries {
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
         Document toUpdate = new Document("$set", new Document("refresh_token_hash_2", refreshTokenHash2)
-                .append("expires_at", expiry).append("last_updated_sign", Utils.getUUID()).append("use_static_key", useStaticKey));
+                .append("expires_at", expiry).append("last_updated_sign", Utils.getUUID()));
 
         UpdateResult result = collection.updateOne(
                 Filters.and(Filters.eq("_id", sessionHandle), Filters.eq("last_updated_sign", lastUpdatedSign)),
