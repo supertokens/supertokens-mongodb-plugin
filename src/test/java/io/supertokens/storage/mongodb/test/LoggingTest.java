@@ -287,15 +287,13 @@ public class LoggingTest {
                 process.startProcess();
                 assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT));
 
-                Start start = (Start) StorageLayer.getStorage(process.getProcess());
-                MongoDBConfig userConfig = io.supertokens.storage.mongodb.config.Config.getConfig(start);
-                String dbPasswordFromConfig = userConfig.getPassword();
-
                 process.kill();
                 assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));
 
-                assertFalse(fileContainsString(stdOutput, dbPasswordFromConfig));
-                assertFalse(fileContainsString(errorOutput, dbPasswordFromConfig));
+                // In this test we can't read the dbPassword from the config as the process didn't start, so we just
+                // check it with the password we set in the config
+                assertFalse(fileContainsString(stdOutput, dbPassword));
+                assertFalse(fileContainsString(errorOutput, dbPassword));
             }
 
         } finally {
