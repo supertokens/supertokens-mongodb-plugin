@@ -11,6 +11,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - This enables smooth switching between `useDynamicAccessTokenSigningKey` settings by allowing refresh calls to
     change the signing key type of a session
 
+## [1.26.0] - 2024-03-05
+
+- Compatibility with plugin interface 5.0.0
+
 ## [1.25.1]
 
 - Fixes issue where error logs were printed to StdOut instead of StdErr.
