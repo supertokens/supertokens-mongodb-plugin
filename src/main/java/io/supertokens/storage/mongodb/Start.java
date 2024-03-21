@@ -139,10 +139,10 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public boolean updateSessionInfo_Transaction(String sessionHandle, String refreshTokenHash2, long expiry,
-            String lastUpdatedSign) throws StorageQueryException {
+            String lastUpdatedSign, boolean useStaticKey) throws StorageQueryException {
         try {
             return Queries.updateSessionInfo_Transaction(this, sessionHandle, refreshTokenHash2, expiry,
-                    lastUpdatedSign);
+                    lastUpdatedSign, useStaticKey);
         } catch (MongoException e) {
             throw new StorageQueryException(e);
         }
