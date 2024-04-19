@@ -38,6 +38,7 @@ import io.supertokens.storage.mongodb.output.Logging;
 import io.supertokens.storage.mongodb.queries.JWTSigningQueries;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +61,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     @Override
     public void deleteAllInformation() throws StorageQueryException {
         try {
-            initStorage(false);
+            initStorage(false, new ArrayList<>());
             enabled = true;
             Queries.deleteAllCollections(this);
         } catch (MongoException e) {
@@ -294,7 +295,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void initStorage(boolean shouldWait) throws DbInitException {
+    public void initStorage(boolean shouldWait, List<TenantIdentifier> tenantIdentifiers) throws DbInitException {
         ConnectionPool.initPool(this);
     }
 
