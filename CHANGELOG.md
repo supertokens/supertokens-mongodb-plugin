@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.26.2] - 2024-04-22
+
+- Compatible with plugin interface version 5.1
+
 ## [1.26.1] - 2024-03-21
 
 - Adds a new `useStaticKey` param to `updateSessionInfo_Transaction`
