@@ -120,7 +120,8 @@ public class Queries {
         Document toUpdate = new Document("$set", new Document("value", info.value)
                 .append("created_at_time", info.createdAtTime).append("last_updated_sign", Utils.getUUID()));
 
-        UpdateResult result = collection.updateOne(Filters.eq("_id", key), toUpdate, new UpdateOptions().upsert(true)); // the
+        UpdateResult result = collection.updateOne(Filters.eq("_id", key), toUpdate,
+                new UpdateOptions().upsert(true)); // the
         // document
         // will
         // be
@@ -239,7 +240,8 @@ public class Queries {
 
     @SuppressWarnings("unchecked")
     static void createNewSession(Start start, String sessionHandle, String userId, String refreshTokenHash2,
-            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime, boolean useStaticKey) {
+                                 JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT,
+                                 long createdAtTime, boolean useStaticKey) {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
@@ -264,7 +266,8 @@ public class Queries {
     }
 
     static boolean updateSessionInfo_Transaction(Start start, String sessionHandle, String refreshTokenHash2,
-            long expiry, String lastUpdatedSign, boolean useStaticKey) throws StorageQueryException {
+                                                 long expiry, String lastUpdatedSign, boolean useStaticKey)
+            throws StorageQueryException {
 
         if (lastUpdatedSign == null) {
             throw new StorageQueryException(new Exception("lastUpdatedSign cannot be null for this update operation"));
@@ -274,7 +277,8 @@ public class Queries {
         MongoCollection collection = client.getCollection(Config.getConfig(start).getSessionInfoCollection());
 
         Document toUpdate = new Document("$set", new Document("refresh_token_hash_2", refreshTokenHash2)
-                .append("expires_at", expiry).append("last_updated_sign", Utils.getUUID()).append("use_static_key", useStaticKey));
+                .append("expires_at", expiry).append("last_updated_sign", Utils.getUUID())
+                .append("use_static_key", useStaticKey));
 
         UpdateResult result = collection.updateOne(
                 Filters.and(Filters.eq("_id", sessionHandle), Filters.eq("last_updated_sign", lastUpdatedSign)),
@@ -345,7 +349,7 @@ public class Queries {
     }
 
     static int updateSession(Start start, String sessionHandle, @Nullable JsonObject sessionData,
-            @Nullable JsonObject jwtData) throws StorageQueryException {
+                             @Nullable JsonObject jwtData) throws StorageQueryException {
 
         if (sessionData == null && jwtData == null) {
             throw new StorageQueryException(new Exception("sessionData and jwtData are null"));
@@ -444,7 +448,8 @@ public class Queries {
         @Override
         public List<KeyValueInfo> map(Document result) throws Exception {
             return result.getList("keys", Document.class).stream().map(
-                    (Document subDoc) -> new KeyValueInfo(subDoc.getString("value"), subDoc.getLong("created_at_time")))
+                            (Document subDoc) -> new KeyValueInfo(subDoc.getString("value"), subDoc.getLong(
+                                    "created_at_time")))
                     .collect(Collectors.toList());
         }
     }

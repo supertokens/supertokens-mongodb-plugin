@@ -54,7 +54,7 @@ public class LogLevelTest {
     public void testLogLevelNoneOutput() throws Exception {
         {
             Utils.setValueInConfig("log_level", "NONE");
-            String[] args = { "../" };
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -98,7 +98,7 @@ public class LogLevelTest {
     public void testLogLevelErrorOutput() throws Exception {
         {
             Utils.setValueInConfig("log_level", "ERROR");
-            String[] args = { "../" };
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -152,7 +152,7 @@ public class LogLevelTest {
     public void testLogLevelWarnOutput() throws Exception {
         {
             Utils.setValueInConfig("log_level", "WARN");
-            String[] args = { "../" };
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -206,7 +206,7 @@ public class LogLevelTest {
     public void testLogLevelInfoOutput() throws Exception {
         {
             Utils.setValueInConfig("log_level", "INFO");
-            String[] args = { "../" };
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -260,7 +260,7 @@ public class LogLevelTest {
     public void testLogLevelDebugOutput() throws Exception {
         {
             Utils.setValueInConfig("log_level", "DEBUG");
-            String[] args = { "../" };
+            String[] args = {"../"};
             TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
             assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));

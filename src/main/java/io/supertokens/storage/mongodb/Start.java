@@ -84,7 +84,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public SessionInfo getSession(TenantIdentifier tenantIdentifier, String sessionHandle) throws StorageQueryException {
+    public SessionInfo getSession(TenantIdentifier tenantIdentifier, String sessionHandle)
+            throws StorageQueryException {
         try {
             return Queries.getSession(this, sessionHandle);
         } catch (MongoException e) {
@@ -93,7 +94,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public int updateSession(TenantIdentifier tenantIdentifier, String sessionHandle, JsonObject sessionData, JsonObject jwtPayload)
+    public int updateSession(TenantIdentifier tenantIdentifier, String sessionHandle, JsonObject sessionData,
+                             JsonObject jwtPayload)
             throws StorageQueryException {
         try {
             return Queries.updateSession(this, sessionHandle, sessionData, jwtPayload);
@@ -112,7 +114,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public String[] getAllNonExpiredSessionHandlesForUser(TenantIdentifier tenantIdentifier, String userId) throws StorageQueryException {
+    public String[] getAllNonExpiredSessionHandlesForUser(TenantIdentifier tenantIdentifier, String userId)
+            throws StorageQueryException {
         try {
             return Queries.getAllNonExpiredSessionHandlesForUser(this, userId);
         } catch (MongoException e) {
@@ -140,7 +143,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public boolean updateSessionInfo_Transaction(String sessionHandle, String refreshTokenHash2, long expiry,
-            String lastUpdatedSign, boolean useStaticKey) throws StorageQueryException {
+                                                 String lastUpdatedSign, boolean useStaticKey)
+            throws StorageQueryException {
         try {
             return Queries.updateSessionInfo_Transaction(this, sessionHandle, refreshTokenHash2, expiry,
                     lastUpdatedSign, useStaticKey);
@@ -159,8 +163,10 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void createNewSession(TenantIdentifier tenantIdentifier, String sessionHandle, String userId, String refreshTokenHash2,
-            JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT, long createdAtTime, boolean useStaticKey)
+    public void createNewSession(TenantIdentifier tenantIdentifier, String sessionHandle, String userId,
+                                 String refreshTokenHash2,
+                                 JsonObject userDataInDatabase, long expiry, JsonObject userDataInJWT,
+                                 long createdAtTime, boolean useStaticKey)
             throws StorageQueryException {
         try {
             Queries.createNewSession(this, sessionHandle, userId, refreshTokenHash2, userDataInDatabase, expiry,
@@ -222,7 +228,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void removeAccessTokenSigningKeysBefore(AppIdentifier appIdentifier, long time) throws StorageQueryException {
+    public void removeAccessTokenSigningKeysBefore(AppIdentifier appIdentifier, long time)
+            throws StorageQueryException {
         try {
             Queries.removeArrayKeyValuesBefore(this, ACCESS_TOKEN_SIGNING_KEY_LIST_NAME, time);
         } catch (MongoException e) {
@@ -300,7 +307,8 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public void setKeyValue(TenantIdentifier tenantIdentifier, String key, KeyValueInfo info) throws StorageQueryException {
+    public void setKeyValue(TenantIdentifier tenantIdentifier, String key, KeyValueInfo info)
+            throws StorageQueryException {
         try {
             Queries.setKeyValue(this, key, info);
         } catch (MongoException e) {
@@ -361,12 +369,14 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
-    public boolean isUserIdBeingUsedInNonAuthRecipe(AppIdentifier appIdentifier, String className, String userId) throws StorageQueryException {
+    public boolean isUserIdBeingUsedInNonAuthRecipe(AppIdentifier appIdentifier, String className, String userId)
+            throws StorageQueryException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void addInfoToNonAuthRecipesBasedOnUserId(TenantIdentifier tenantIdentifier, String className, String userId) throws StorageQueryException {
+    public void addInfoToNonAuthRecipesBasedOnUserId(TenantIdentifier tenantIdentifier, String className, String userId)
+            throws StorageQueryException {
         throw new UnsupportedOperationException();
     }
 
@@ -388,7 +398,7 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
             if (e.getMessage().contains("(DuplicateKey)")
                     && e.getMessage().contains(Config.getConfig(this).getDatabaseName() + "."
-                            + Config.getConfig(this).getJWTSigningKeysCollection())) {
+                    + Config.getConfig(this).getJWTSigningKeysCollection())) {
                 throw new DuplicateKeyIdException();
             }
 

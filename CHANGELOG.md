@@ -19,8 +19,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Compatibility with plugin interface 6.0.0
 - Adds a new `useStaticKey` param to `updateSessionInfo_Transaction`
-  - This enables smooth switching between `useDynamicAccessTokenSigningKey` settings by allowing refresh calls to
-    change the signing key type of a session
+    - This enables smooth switching between `useDynamicAccessTokenSigningKey` settings by allowing refresh calls to
+      change the signing key type of a session
 
 ## [1.26.0] - 2024-03-05
 
@@ -46,43 +46,42 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Migration
 
-
 - If using `access_token_signing_key_dynamic` false:
-  - ```
-    db.session_info.update({},
-      {
-        "$set": {
-          "use_static_key": true
-        }
-      });
+    - ```
+  db.session_info.update({},
+  {
+  "$set": {
+  "use_static_key": true
+  }
+  });
     ```
-  - ```
-    db.key_value.aggregate([
-      {
-        "$match": {
-          _id: "access_token_signing_key_list"
-        }
-      },
-      {
-        $unwind: "$keys"
-      },
-      {
-        $addFields: {
-          _id: {
-            "$concat": [
-              "s-",
-              {
-                $convert: {
-                  input: "$keys.created_at_time",
-                  to: "string"
-                }
-              }
-            ]
-          },
-          "key_string": "$keys.value",
-          "algorithm": "RS256",
-          "created_at": "$keys.created_at_time",
-          
+    - ```
+  db.key_value.aggregate([
+  {
+  "$match": {
+  _id: "access_token_signing_key_list"
+  }
+  },
+  {
+  $unwind: "$keys"
+  },
+  {
+  $addFields: {
+  _id: {
+  "$concat": [
+  "s-",
+  {
+  $convert: {
+  input: "$keys.created_at_time",
+  to: "string"
+  }
+  }
+  ]
+  },
+  "key_string": "$keys.value",
+  "algorithm": "RS256",
+  "created_at": "$keys.created_at_time",
+
         }
       },
       {
@@ -97,17 +96,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
           
         }
       }
-    ]);
+  ]);
     ```
 
 - If using `access_token_signing_key_dynamic` true or not set:
-  - ```
-    db.session_info.update({},
-      {
-        "$set": {
-          "use_static_key": false
-        }
-      });
+    - ```
+  db.session_info.update({},
+  {
+  "$set": {
+  "use_static_key": false
+  }
+  });
     ```
 - Fixed an issue when adding new access token signing key to an empty list
 
