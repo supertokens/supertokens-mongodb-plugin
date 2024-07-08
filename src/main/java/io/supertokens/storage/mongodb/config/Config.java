@@ -51,7 +51,8 @@ public class Config extends ResourceDistributor.SingletonResource {
         return (Config) start.getResourceDistributor().getResource(RESOURCE_KEY);
     }
 
-    public static void loadConfig(Start start, JsonObject configJson, Set<LOG_LEVEL> logLevels, TenantIdentifier tenantIdentifier) throws
+    public static void loadConfig(Start start, JsonObject configJson, Set<LOG_LEVEL> logLevels,
+                                  TenantIdentifier tenantIdentifier) throws
             InvalidConfigException {
         if (getInstance(start) != null) {
             return;

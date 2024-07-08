@@ -55,7 +55,7 @@ public class LoggingTest {
 
     @Test
     public void defaultLogging() throws Exception {
-        String[] args = { "../" };
+        String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -98,7 +98,7 @@ public class LoggingTest {
     @Test
     public void customLogging() throws Exception {
         try {
-            String[] args = { "../" };
+            String[] args = {"../"};
 
             Utils.setValueInConfig("info_log_path", "\"tempLogging/info.log\"");
             Utils.setValueInConfig("error_log_path", "\"tempLogging/error.log\"");
@@ -149,7 +149,7 @@ public class LoggingTest {
 
     @Test
     public void confirmLoggerClosed() throws Exception {
-        String[] args = { "../" };
+        String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
 
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
@@ -171,7 +171,7 @@ public class LoggingTest {
 
     @Test
     public void testStandardOutLoggingWithNullStr() throws Exception {
-        String[] args = { "../" };
+        String[] args = {"../"};
         ByteArrayOutputStream stdOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
 
@@ -207,7 +207,7 @@ public class LoggingTest {
 
     @Test
     public void testStandardOutLoggingWithNull() throws Exception {
-        String[] args = { "../" };
+        String[] args = {"../"};
         ByteArrayOutputStream stdOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
 
@@ -243,7 +243,7 @@ public class LoggingTest {
 
     @Test
     public void testDBPasswordIsNotLoggedWhenProcessStartsEnds() throws Exception {
-        String[] args = { "../" };
+        String[] args = {"../"};
 
         Utils.setValueInConfig("error_log_path", "null");
         Utils.setValueInConfig("info_log_path", "null");

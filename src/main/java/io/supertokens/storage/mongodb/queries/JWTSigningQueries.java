@@ -93,7 +93,8 @@ public class JWTSigningQueries {
     }
 
     public static boolean setJWTSigningKeyInfoIfNoKeyForAlgorithmExists_Transaction(Start start,
-            JWTSigningKeyInfo keyInfo) throws StorageQueryException {
+                                                                                    JWTSigningKeyInfo keyInfo)
+            throws StorageQueryException {
         MongoDatabase client = ConnectionPool.getClientConnectedToDatabase(start);
         MongoCollection collection = client.getCollection(Config.getConfig(start).getJWTSigningKeysCollection());
 

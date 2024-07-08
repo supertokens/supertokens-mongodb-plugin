@@ -50,7 +50,7 @@ public class KeyValueInfoArrayTest {
 
     @Test
     public void checkThatAddWorksWorksWithNullLastCreated() throws InterruptedException, StorageQueryException {
-        String[] args = { "../" };
+        String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -74,7 +74,7 @@ public class KeyValueInfoArrayTest {
 
     @Test
     public void checkThatAddWorksWorksWithWrongLastCreated() throws InterruptedException, StorageQueryException {
-        String[] args = { "../" };
+        String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -83,7 +83,8 @@ public class KeyValueInfoArrayTest {
             return;
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
-        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null), System.currentTimeMillis() + 1000);
+        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null),
+                System.currentTimeMillis() + 1000);
 
         assertFalse(noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L));
         assertEquals(noSQLSessionStorage_1.getAccessTokenSigningKeys_Transaction().length, 0);
@@ -98,7 +99,7 @@ public class KeyValueInfoArrayTest {
 
     @Test
     public void checkThatAddWorksWithCorrectLastCreated() throws InterruptedException, StorageQueryException {
-        String[] args = { "../" };
+        String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -108,7 +109,8 @@ public class KeyValueInfoArrayTest {
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
 
-        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null), System.currentTimeMillis() + 1000);
+        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null),
+                System.currentTimeMillis() + 1000);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key2", 101), 100L);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key3", 200), 101L);
@@ -130,7 +132,7 @@ public class KeyValueInfoArrayTest {
 
     @Test
     public void checkRemoveAccessTokenSigningKeysBefore() throws InterruptedException, StorageQueryException {
-        String[] args = { "../" };
+        String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -140,7 +142,8 @@ public class KeyValueInfoArrayTest {
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
 
-        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null), System.currentTimeMillis() + 1000);
+        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null),
+                System.currentTimeMillis() + 1000);
 
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key2", 101), 100L);
@@ -159,7 +162,7 @@ public class KeyValueInfoArrayTest {
 
     @Test
     public void checkThatAddWorksWorksWithEmptyList() throws InterruptedException, StorageQueryException {
-        String[] args = { "../" };
+        String[] args = {"../"};
         TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STARTED));
 
@@ -169,7 +172,8 @@ public class KeyValueInfoArrayTest {
         }
         SessionNoSQLStorage_1 noSQLSessionStorage_1 = (SessionNoSQLStorage_1) sessionStorage;
 
-        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null), System.currentTimeMillis() + 1000);
+        sessionStorage.removeAccessTokenSigningKeysBefore(new AppIdentifier(null, null),
+                System.currentTimeMillis() + 1000);
 
         noSQLSessionStorage_1.addAccessTokenSigningKey_Transaction(new KeyValueInfo("key1", 100), null);
 
