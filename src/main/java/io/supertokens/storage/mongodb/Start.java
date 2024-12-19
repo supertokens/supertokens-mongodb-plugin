@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
@@ -253,6 +254,11 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
     }
 
     @Override
+    public Storage createBulkImportProxyStorageInstance() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public STORAGE_TYPE getType() {
         return STORAGE_TYPE.NOSQL_1;
     }
@@ -370,6 +376,13 @@ public class Start implements SessionNoSQLStorage_1, JWTRecipeNoSQLStorage_1 {
 
     @Override
     public boolean isUserIdBeingUsedInNonAuthRecipe(AppIdentifier appIdentifier, String className, String userId)
+            throws StorageQueryException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<String, List<String>> findNonAuthRecipesWhereForUserIdsUsed(AppIdentifier appIdentifier,
+                                                                           List<String> userIds)
             throws StorageQueryException {
         throw new UnsupportedOperationException();
     }
