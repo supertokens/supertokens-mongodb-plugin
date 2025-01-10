@@ -9,7 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.30.0] - 2024-12-19
 
-- Compatible with plugin interface version 6.4
+- Compatible with plugin interface version 7.0
 
 ## [1.29.0] - 2024-10-04
 
