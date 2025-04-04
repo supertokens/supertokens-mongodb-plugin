@@ -17,10 +17,7 @@
 
 package io.supertokens.storage.mongodb.test;
 
-import com.google.gson.JsonObject;
 import io.supertokens.ProcessState;
-import io.supertokens.session.Session;
-import io.supertokens.session.info.SessionInformationHolder;
 import io.supertokens.storage.mongodb.ConnectionPoolTestContent;
 import io.supertokens.storage.mongodb.Start;
 import io.supertokens.storage.mongodb.config.Config;
@@ -146,17 +143,18 @@ public class ConfigTest {
     public void testThatMissingConfigFileThrowsError() throws Exception {
         String[] args = {"../"};
 
-        ProcessBuilder pb = new ProcessBuilder("rm", "-r", "config.yaml");
+
+        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
+
+        ProcessBuilder pb = new ProcessBuilder("rm", "-r", "config" + System.getProperty("org.gradle.test.worker") + ".yaml");
         pb.directory(new File(args[0]));
         Process process1 = pb.start();
         process1.waitFor();
 
-        TestingProcessManager.TestingProcess process = TestingProcessManager.start(args);
-
         ProcessState.EventAndException e = process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.INIT_FAILURE);
         assertNotNull(e);
         TestCase.assertEquals(e.exception.getMessage(),
-                "../config.yaml (No such file or directory)");
+                "../config" + System.getProperty("org.gradle.test.worker") +".yaml (No such file or directory)");
 
         process.kill();
         assertNotNull(process.checkOrWaitForEvent(ProcessState.PROCESS_STATE.STOPPED));

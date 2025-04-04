@@ -1,7 +1,7 @@
 mongodb_config_version: 0
 
 # (COMPULSORY) string value. This is the connection uri to connect to a mongodb instance or cluster as per https://docs.mongodb.com/manual/reference/connection-string/
-mongodb_connection_uri: "mongodb://root:root@localhost:27017"
+mongodb_connection_uri: ""
 
 
 # (OPTIONAL | Default: "supertokens") string value. The database name to store SuperTokens related data.

@@ -172,6 +172,9 @@ public class MongoDBConfig {
     }
 
     void validateAndInitialise() throws InvalidConfigException {
+        if (mongodb_connection_uri != null && mongodb_connection_uri.isBlank()) {
+            mongodb_connection_uri = "mongodb://root:root@localhost:" + System.getProperty("ST_MONGODB_PLUGIN_SERVER_PORT", "27017");
+        }
 
         if (mongodb_connection_uri == null) {
             throw new InvalidConfigException(
